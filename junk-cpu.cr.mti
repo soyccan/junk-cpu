@@ -1,0 +1,63 @@
+C:/Users/soyccan/Documents/ca/junk-cpu/testbench.v {1 {vlog -work junk-cpu -stats=none C:/Users/soyccan/Documents/ca/junk-cpu/testbench.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module TestBench
+
+Top level modules:
+	TestBench
+
+} {} {}} C:/Users/soyccan/Documents/ca/junk-cpu/Sign_Extend.v {1 {vlog -work work -stats=none C:/Users/soyccan/Documents/ca/junk-cpu/Sign_Extend.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module Sign_Extend
+
+Top level modules:
+	Sign_Extend
+
+} {} {}} C:/Users/soyccan/Documents/ca/junk-cpu/CPU.v {1 {vlog -work junk-cpu -stats=none C:/Users/soyccan/Documents/ca/junk-cpu/CPU.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module CPU
+
+Top level modules:
+	CPU
+
+} {} {}} C:/Users/soyccan/Documents/ca/junk-cpu/Registers.v {1 {vlog -work junk-cpu -stats=none C:/Users/soyccan/Documents/ca/junk-cpu/Registers.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module Registers
+
+Top level modules:
+	Registers
+
+} {} {}} C:/Users/soyccan/Documents/ca/junk-cpu/Control.v {1 {vlog -work junk-cpu -stats=none C:/Users/soyccan/Documents/ca/junk-cpu/Control.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module Control
+
+Top level modules:
+	Control
+
+} {} {}} C:/Users/soyccan/Documents/ca/junk-cpu/Instruction_Memory.v {1 {vlog -work junk-cpu -stats=none C:/Users/soyccan/Documents/ca/junk-cpu/Instruction_Memory.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module Instruction_Memory
+
+Top level modules:
+	Instruction_Memory
+
+} {} {}} C:/Users/soyccan/Documents/ca/junk-cpu/ALU_Control.v {1 {vlog -work junk-cpu -sv -stats=none {C:\Users\soyccan\Documents\ca\junk-cpu\ALU_Control.v}
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module ALU_Control
+
+Top level modules:
+	ALU_Control
+
+} {} {}} C:/Users/soyccan/Documents/ca/junk-cpu/Data_Memory.v {1 {vlog -work junk-cpu -stats=none C:/Users/soyccan/Documents/ca/junk-cpu/Data_Memory.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+
+} {} {}} C:/Users/soyccan/Documents/ca/junk-cpu/PC.v {1 {vlog -work junk-cpu -stats=none C:/Users/soyccan/Documents/ca/junk-cpu/PC.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+-- Compiling module PC
+
+Top level modules:
+	PC
+
+} {} {}} C:/Users/soyccan/Documents/ca/junk-cpu/Const.v {1 {vlog -work junk-cpu -stats=none C:/Users/soyccan/Documents/ca/junk-cpu/Const.v
+Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
+
+} {} {}}
