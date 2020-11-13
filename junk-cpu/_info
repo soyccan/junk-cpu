@@ -9,46 +9,46 @@ z2
 cModel Technology
 dC:/Users/soyccan/Documents/ca/modelsim_demo1
 vALU
-!s110 1605112784
+Z0 !s110 1605204239
 !i10b 1
 !s100 EPTQDzA:[fhF8dNbdhiM[2
 IDjP5G`]]BeOI>hjn6WgD_0
-Z0 VDg1SIo80bB@j0V0VzS_@n1
-Z1 dC:/Users/soyccan/Documents/ca/junk-cpu
-w1605112779
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+Z2 dC:/Users/soyccan/Documents/ca/junk-cpu
+w1605113413
 8C:/Users/soyccan/Documents/ca/junk-cpu/ALU.v
 FC:/Users/soyccan/Documents/ca/junk-cpu/ALU.v
 L0 2
-Z2 OP;L;10.4a;61
+Z3 OP;L;10.4a;61
 r1
 !s85 0
 31
-!s108 1605112784.000000
+Z4 !s108 1605204239.000000
 !s107 Const.v|C:/Users/soyccan/Documents/ca/junk-cpu/ALU.v|
 !s90 -reportprogress|300|-work|junk-cpu|-stats=none|C:/Users/soyccan/Documents/ca/junk-cpu/ALU.v|
 !s101 -O0
 !i113 1
-Z3 o-work junk-cpu -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact -O0
+Z5 o-work junk-cpu -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact -O0
 n@a@l@u
 vALU_Control
 DXx6 sv_std 3 std 0 22 WmjPaeP=7F5?QFXzJ>D[Q2
-Z4 !s110 1605111845
+Z6 !s110 1605204240
 !i10b 1
 !s100 Va^cC6^J8ZBIPGDfF1lJE2
 IHE6a^EO07;Gfggi]JdeNJ2
-R0
+R1
 !s105 ALU_Control_v_unit
 S1
-R1
+R2
 w1605109307
 8C:\Users\soyccan\Documents\ca\junk-cpu\ALU_Control.v
 FC:\Users\soyccan\Documents\ca\junk-cpu\ALU_Control.v
 L0 2
-R2
+R3
 r1
 !s85 0
 31
-Z5 !s108 1605111845.000000
+R4
 !s107 Const.v|C:\Users\soyccan\Documents\ca\junk-cpu\ALU_Control.v|
 !s90 -reportprogress|300|-work|junk-cpu|-sv|-stats=none|C:\Users\soyccan\Documents\ca\junk-cpu\ALU_Control.v|
 !s101 -O0
@@ -56,131 +56,131 @@ Z5 !s108 1605111845.000000
 o-work junk-cpu -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact -O0
 n@a@l@u_@control
 vControl
-R4
+R6
 !i10b 1
 !s100 7D^0:zzHh0n6VLFl9KJ=Q1
 IU[UKgXY;9imO]Vh]EE4a;0
-R0
 R1
-w1605109784
+R2
+w1605202577
 8C:/Users/soyccan/Documents/ca/junk-cpu/Control.v
 FC:/Users/soyccan/Documents/ca/junk-cpu/Control.v
 L0 2
-R2
+R3
 r1
 !s85 0
 31
-R5
+Z7 !s108 1605204240.000000
 !s107 Const.v|C:/Users/soyccan/Documents/ca/junk-cpu/Control.v|
 !s90 -reportprogress|300|-work|junk-cpu|-stats=none|C:/Users/soyccan/Documents/ca/junk-cpu/Control.v|
 !s101 -O0
 !i113 1
-R3
+R5
 n@control
 vCPU
-R4
+R6
 !i10b 1
 !s100 1hAhlVzJ]i@E;1G_6iSM@2
 I2@L<7GPaWb^a[h]`32`G`3
-R0
 R1
-Z6 w1605111632
+R2
+Z8 w1605111632
 8C:/Users/soyccan/Documents/ca/junk-cpu/CPU.v
 FC:/Users/soyccan/Documents/ca/junk-cpu/CPU.v
 L0 1
-R2
+R3
 r1
 !s85 0
 31
-R5
+R7
 !s107 C:/Users/soyccan/Documents/ca/junk-cpu/CPU.v|
 !s90 -reportprogress|300|-work|junk-cpu|-stats=none|C:/Users/soyccan/Documents/ca/junk-cpu/CPU.v|
 !s101 -O0
 !i113 1
-R3
+R5
 n@c@p@u
 vInstruction_Memory
-R4
+R0
 !i10b 1
 !s100 2UWNbl_XA[R`nQCLmF_541
 IC0EBVVUCzShDcPX2YZ9nh0
-R0
 R1
-Z7 w1605111360
+R2
+Z9 w1605111360
 8C:/Users/soyccan/Documents/ca/junk-cpu/Instruction_Memory.v
 FC:/Users/soyccan/Documents/ca/junk-cpu/Instruction_Memory.v
 L0 1
-R2
+R3
 r1
 !s85 0
 31
-R5
+R4
 !s107 C:/Users/soyccan/Documents/ca/junk-cpu/Instruction_Memory.v|
 !s90 -reportprogress|300|-work|junk-cpu|-stats=none|C:/Users/soyccan/Documents/ca/junk-cpu/Instruction_Memory.v|
 !s101 -O0
 !i113 1
-R3
+R5
 n@instruction_@memory
 vPC
-R4
+R0
 !i10b 1
 !s100 0n1c^@9f^?mf<X_dj1ZMl1
 I@5=@=of^AMfOL`]]]DGSJ1
-R0
 R1
-R7
+R2
+R9
 8C:/Users/soyccan/Documents/ca/junk-cpu/PC.v
 FC:/Users/soyccan/Documents/ca/junk-cpu/PC.v
 L0 1
-R2
+R3
 r1
 !s85 0
 31
-R5
+R4
 !s107 C:/Users/soyccan/Documents/ca/junk-cpu/PC.v|
 !s90 -reportprogress|300|-work|junk-cpu|-stats=none|C:/Users/soyccan/Documents/ca/junk-cpu/PC.v|
 !s101 -O0
 !i113 1
-R3
+R5
 n@p@c
 vRegisters
-R4
+R0
 !i10b 1
 !s100 `NDP^LnmWEJci79[iZFSL1
 IYG`JkLko3__SC7?<FS5J<2
-R0
 R1
-R7
+R2
+R9
 8C:/Users/soyccan/Documents/ca/junk-cpu/Registers.v
 FC:/Users/soyccan/Documents/ca/junk-cpu/Registers.v
 L0 1
-R2
+R3
 r1
 !s85 0
 31
-R5
+R4
 !s107 C:/Users/soyccan/Documents/ca/junk-cpu/Registers.v|
 !s90 -reportprogress|300|-work|junk-cpu|-stats=none|C:/Users/soyccan/Documents/ca/junk-cpu/Registers.v|
 !s101 -O0
 !i113 1
-R3
+R5
 n@registers
 vSign_Extend
-!s110 1605111846
+R6
 !i10b 1
 !s100 h1NSLlc7Y4c2ClNaDlg[V1
 IPH@5_:<oQhGjR<Cf?jI`]2
-R0
 R1
-R6
+R2
+R8
 8C:/Users/soyccan/Documents/ca/junk-cpu/Sign_Extend.v
 FC:/Users/soyccan/Documents/ca/junk-cpu/Sign_Extend.v
 L0 1
-R2
+R3
 r1
 !s85 0
 31
-R5
+R7
 !s107 C:/Users/soyccan/Documents/ca/junk-cpu/Sign_Extend.v|
 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/soyccan/Documents/ca/junk-cpu/Sign_Extend.v|
 !s101 -O0
@@ -192,13 +192,13 @@ vSign_Extension
 !i10b 1
 !s100 =h`3Yn^91X_gmXi4UPU1M2
 I6><oEEkUgP_I>4LCa>9Ig0
-R0
 R1
+R2
 w1605109966
 8C:/Users/soyccan/Documents/ca/junk-cpu/Sign_Extension.v
 FC:/Users/soyccan/Documents/ca/junk-cpu/Sign_Extension.v
 L0 1
-R2
+R3
 r1
 !s85 0
 31
@@ -207,27 +207,27 @@ r1
 !s90 -reportprogress|300|-work|junk-cpu|-stats=none|C:/Users/soyccan/Documents/ca/junk-cpu/Sign_Extension.v|
 !s101 -O0
 !i113 1
-R3
+R5
 n@sign_@extension
 vTestBench
-!s110 1605111911
+R0
 !i10b 1
 !s100 H=fHMbea`3=aeem2^BGOn2
 IBDbnhD?MWG:C:;FNnkDPV0
-R0
 R1
+R2
 w1605111907
 8C:/Users/soyccan/Documents/ca/junk-cpu/testbench.v
 FC:/Users/soyccan/Documents/ca/junk-cpu/testbench.v
 L0 3
-R2
+R3
 r1
 !s85 0
 31
-!s108 1605111911.000000
+R4
 !s107 C:/Users/soyccan/Documents/ca/junk-cpu/testbench.v|
 !s90 -reportprogress|300|-work|junk-cpu|-stats=none|C:/Users/soyccan/Documents/ca/junk-cpu/testbench.v|
 !s101 -O0
 !i113 1
-R3
+R5
 n@test@bench

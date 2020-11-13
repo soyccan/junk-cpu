@@ -26,13 +26,6 @@ Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 
 Top level modules:
 	Registers
 
-} {} {}} C:/Users/soyccan/Documents/ca/junk-cpu/Control.v {1 {vlog -work junk-cpu -stats=none C:/Users/soyccan/Documents/ca/junk-cpu/Control.v
-Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
--- Compiling module Control
-
-Top level modules:
-	Control
-
 } {} {}} C:/Users/soyccan/Documents/ca/junk-cpu/Instruction_Memory.v {1 {vlog -work junk-cpu -stats=none C:/Users/soyccan/Documents/ca/junk-cpu/Instruction_Memory.v
 Model Technology ModelSim PE Student Edition vlog 10.4a Compiler 2015.03 Apr  7 2015
 -- Compiling module Instruction_Memory
