@@ -5,7 +5,34 @@ import struct
 
 from test_common import instructions
 
-register = [0] * 32
+
+
+class RegiserFile:
+    def __init__(self, num_reg=32):
+        self._registers = [0] * num_reg
+
+    def __getitem__(self, index):
+        return self.get(index)
+
+    def __setitem__(self, index, value):
+        self.set(index, value)
+
+    def get(self, index):
+        # signed 32-bit
+        return struct.unpack('i', struct.pack('I', self._registers[index]))[0]
+
+    def getu(self, index):
+        # unsigned 32-bit
+        return self._registers[index]
+
+    def set(self, index, value):
+        if value < 0:
+            value = (-value - 1) ^ 0xffffffff
+        assert value >= 0
+        self._registers[index] = value & 0xffffffff
+
+
+register = RegiserFile()
 pc = 0
 
 for ln in sys.stdin.readlines():
@@ -37,23 +64,22 @@ for ln in sys.stdin.readlines():
         imm = int(rs2)
 
     if inst_name == 'and':
-        register[rd] = register[rs1] & register[rs2]
+        register[rd] = register.getu(rs1) & register.getu(rs2)
     elif inst_name == 'xor':
-        register[rd] = register[rs1] ^ register[rs2]
+        register[rd] = register.getu(rs1) ^ register.getu(rs2)
     elif inst_name == 'sll':
-        # to unsigned
-        shft_amt = struct.unpack('L', struct.pack('l', register[rs2]))[0]
-        register[rd] = register[rs1] << shft_amt
+        # shift amount is lower 5 bits
+        register[rd] = register.getu(rs1) << (register.getu(rs2) & 0x1f)
     elif inst_name == 'add':
-        register[rd] = register[rs1] + register[rs2]
+        register[rd] = register.getu(rs1) + register.getu(rs2)
     elif inst_name == 'sub':
-        register[rd] = register[rs1] - register[rs2]
+        register[rd] = register.getu(rs1) - register.getu(rs2)
     elif inst_name == 'mul':
-        register[rd] = register[rs1] * register[rs2]
+        register[rd] = register.getu(rs1) * register.getu(rs2)
     elif inst_name == 'addi':
-        register[rd] = register[rs1] + imm
+        register[rd] = register.getu(rs1) + imm
     elif inst_name == 'srai':
-        register[rd] = register[rs1] >> imm
+        register[rd] = register.getu(rs1) >> imm
 
     pc += 4
 

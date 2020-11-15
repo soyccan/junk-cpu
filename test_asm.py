@@ -5,6 +5,9 @@
 import sys
 import subprocess
 import logging as log
+import os
+import os.path
+import glob
 
 
 # Reference: https://github.com/Gallopsled/pwntools/blob/dev/pwnlib/asm.py
@@ -48,17 +51,25 @@ def format_machine_code(m_code):
     res.insert(29, '_')
     return ''.join(res)
 
+def search_in_path(names):
+    for name in names:
+        for dir_ in os.environ['PATH'].split(':'):
+            res = sorted(glob.glob(os.path.join(dir_, name)))
+            if res:
+                return res[0]
+    return None
 
 def main():
     #  log.basicConfig(level='DEBUG')
 
     asm_code = sys.stdin.readlines()
 
-    _run(['riscv64-linux-gnu-as', '-o', '/tmp/a.out'], 
-         ''.join(asm_code).encode())
+    assembler = search_in_path(['riscv64-linux-gnu-as', 'riscv64-unknown-elf-as'])
+    objcopy = search_in_path(['riscv64-linux-gnu-objcopy', 'riscv64-unknown-elf-objcopy'])
 
-    _run(['riscv64-linux-gnu-objcopy', 
-          '-O', 'binary', '/tmp/a.out', '/tmp/a.out'])
+    _run([assembler, '-o', '/tmp/a.out'], ''.join(asm_code).encode())
+
+    _run([objcopy, '-O', 'binary', '/tmp/a.out', '/tmp/a.out'])
     
     m_code = open('/tmp/a.out', 'br').read()
     m_code = [format_machine_code(m_code[i:i+4])

@@ -4,7 +4,7 @@ import sys
 
 from test_common import instructions
 
-num_inst = 29
+num_inst = 255
 res = []
 for i in range(num_inst):
     inst_name = random.sample(instructions.keys(), 1)[0]

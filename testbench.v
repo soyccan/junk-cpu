@@ -47,7 +47,7 @@ initial begin
 end
 
 always@(posedge Clk) begin
-    if(counter == 30)    // stop after 30 cycles
+    if(counter == 256)    // stop after 30 cycles
         $finish;
 
     // print PC
