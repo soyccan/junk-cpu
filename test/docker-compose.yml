@@ -1,8 +1,0 @@
-version: '3'
-services:
-    riscv:
-        build: .
-        hostname: 'riscv'
-    riscv-ta:
-        image: ntuca2020/hw2
-        hostname: 'riscv-ta'

@@ -1,9 +1,5 @@
 FROM ubuntu:20.04
 
-# Copy hw2
-COPY Examples /root/Examples
-COPY Problems /root/Problems
-
 ENV DEBIAN_FRONTEND="noninteractive"
 
 # Update system and install packages
@@ -61,13 +57,17 @@ RUN rm -rf /riscv-openocd
 
 RUN echo "export PATH=$PATH:/opt/riscv/bin" >> ~/.bashrc
 
+# Python
+RUN apt install -yq python3
+
 # Cleanup
 RUN apt-get autoremove -y && apt-get autoclean
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/log/*
 
 # Copy files
 WORKDIR /root
-COPY instruction.in .
+COPY test/* /root/
+VOLUME /root/tmp
 
-# Compile asm
-RUN riscv64-unknown-elf-as < instruction.in
+# Start Up
+CMD ["./startup.sh"]

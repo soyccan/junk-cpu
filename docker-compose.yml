@@ -1,0 +1,8 @@
+version: '3'
+services:
+    riscv:
+        build: .
+        volumes:
+            - ./tmp:/root/tmp
+volumes:
+    tmp:
