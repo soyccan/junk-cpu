@@ -2,9 +2,9 @@
 import random
 import sys
 
-from test_common import instructions
+from common import instructions
 
-num_inst = 255
+num_inst = 29
 res = []
 for i in range(num_inst):
     inst_name = random.sample(instructions.keys(), 1)[0]
@@ -12,7 +12,7 @@ for i in range(num_inst):
     rs1 = random.randint(0, 31)
     rs2 = random.randint(0, 31)
     rd = random.randint(0, 31)
-    imm = random.randint(-(1<<11), (1<<11)-1)
+    imm = random.randint(-(1 << 11), (1 << 11)-1)
     shft_amt = random.randint(0, 31)
     if inst['type'] == 'r':
         res.append('{} x{}, x{}, x{}\n'.format(inst_name,

@@ -16,6 +16,9 @@ CPU CPU(
 );
 
 initial begin
+    $dumpfile("a.vcd");
+    $dumpvars;
+
     counter = 0;
 
     // initialize instruction memory
@@ -47,7 +50,7 @@ initial begin
 end
 
 always@(posedge Clk) begin
-    if(counter == 256)    // stop after 30 cycles
+    if(counter == 10)    // stop after 30 cycles
         $finish;
 
     // print PC
