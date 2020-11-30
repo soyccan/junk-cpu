@@ -6,5 +6,6 @@ instructions = {
         'sub': {'type': 'r'},
         'mul': {'type': 'r'},
         'addi': {'type': 'i'},
-        'srai': {'type': 'i'} }
+        'srai': {'type': 'i'},
+        'lui': {'type': 'u'} }
 

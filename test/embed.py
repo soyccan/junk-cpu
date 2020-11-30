@@ -18,18 +18,22 @@ res += [',x{}=0'.format(i) for i in range(1, 32)]
 res.append(';\n')
 
 for ln in sys.stdin.readlines():
-    inst_name, rd, rs1, rs2 = ln.strip('\n').split(' ')
+    inst_name, rd, rs1, *rs2 = ln.strip('\n').split(' ')
     inst = instructions[inst_name]
 
     if inst['type'] == 'r':
         rd = rd[:-1]
         rs1 = rs1[:-1]
-        rs2 = rs2
+        rs2 = rs2[0]
 
     elif inst['type'] == 'i':
         rd = rd[:-1]
         rs1 = rs1[:-1]
-        imm = rs2
+        imm = rs2[0]
+
+    elif inst['type'] == 'u':
+        rd = rd[:-1]
+        imm = rs1[:-1]
 
     res.append('printf("PC = %d\\n", (pc+=4));\n')
     res.append('printf("Registers\\n");\n')
@@ -51,6 +55,8 @@ for ln in sys.stdin.readlines():
     elif inst['type'] == 'i':
         res.append('"{} %[_{}], %[_{}], {}\\n\\t"\n'.format(
             inst_name, rd, rs1, imm))
+    elif inst['type'] == 'u':
+        res.append('"{} %[_{}], {}\\n\\t"\n'.format(inst_name, rd, imm))
     else:
         raise ValueError()
 
@@ -75,6 +81,8 @@ for ln in sys.stdin.readlines():
         else:
             res.append(': [_{}] "=r" ({})\n'.format(rd, rd))
             res.append(': [_{}] "r" ({})\n'.format(rs1, rs1))
+    elif inst['type'] == 'u':
+        res.append(': [_{}] "=r" ({})\n'.format(rd, rd))
     else:
         raise ValueError()
     res.append(');\n')
