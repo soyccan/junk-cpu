@@ -3,7 +3,7 @@
 # openocd -f spike.cfg &
 set -ex
 cd tmp
-riscv64-unknown-elf-gcc -g -Og -c a.c
-riscv64-unknown-elf-gcc -g -Og -T ../spike.lds -nostartfiles a.o
-spike pk a.out | head -n -10 | tail -n +2 | tee a.log
+riscv32-unknown-elf-gcc -g -Og -c a.c
+riscv32-unknown-elf-gcc -g -Og -T ../spike.lds -nostartfiles a.o
+spike /opt/riscv/riscv32-unknown-elf/bin/pk a.out | head -n -10 | tail -n +2 | tee a.log
 bash

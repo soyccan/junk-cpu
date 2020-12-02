@@ -1,3 +1,4 @@
+#!python3
 """ Generate random instructions """
 import random
 import sys
@@ -14,6 +15,7 @@ for i in range(num_inst):
     rd = random.randint(5, 10)
     imm = random.randint(-(1 << 11), (1 << 11)-1)
     shft_amt = random.randint(0, 31)
+    upper_val = random.randint(0, (1 << 20) - 1)
     if inst['type'] == 'r':
         res.append('{} x{}, x{}, x{}\n'.format(inst_name,
                                                str(rd),
@@ -31,6 +33,11 @@ for i in range(num_inst):
                                                   str(rd),
                                                   str(rs1),
                                                   str(imm)))
+
+    elif inst['type'] == 'u':
+        res.append('{} x{}, {}\n'.format(inst_name,
+                                         str(rd),
+                                         str(upper_val)))
 
     else:
         raise Exception('Unsupported instruction!')
