@@ -8,11 +8,20 @@ module Control(input  [6:0] Opcode_i,
                output ALUSrc_o,
                output Branch_o);
 
-// always @* begin
-//     case (Opcode_i)
-//         7'b0110011: {ALUOp_o, ALUSrc_o, RegWrite_o} = {`ALU_OP_REG, 1'b0, 1'b1};  // R-type arithmetic
-//         7'b0010011: {ALUOp_o, ALUSrc_o, RegWrite_o} = {`ALU_OP_IMM, 1'b1, 1'b1};  // I-type arithmetic
-//     endcase
-// end
+assign {RegWrite_o, MemToReg_o, MemRead_o, MemWrite_o, ALUSrc_o, Branch_o} =
+        Opcode_i == `OPCODE_OP     ? 6'b10x000 :
+        Opcode_i == `OPCODE_IMM    ? 6'b10x010 :
+        Opcode_i == `OPCODE_LOAD   ? 6'b111010 :
+        Opcode_i == `OPCODE_STORE  ? 6'b0xx110 :
+        Opcode_i == `OPCODE_BRANCH ? 6'b0xx001 :
+        6'bxxxxxx;
+
+assign ALUOp_o =
+        Opcode_i == `OPCODE_OP     ? `ALU_OP_REG :
+        Opcode_i == `OPCODE_IMM    ? `ALU_OP_IMM :
+        Opcode_i == `OPCODE_LOAD   ? `ALU_OP_IMM :
+        Opcode_i == `OPCODE_STORE  ? `ALU_OP_IMM :
+        Opcode_i == `OPCODE_BRANCH ? `ALU_OP_REG :
+        2'bxx;
 
 endmodule

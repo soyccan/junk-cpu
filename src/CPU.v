@@ -7,13 +7,12 @@ wire rst = rst_i;
 wire start = start_i;
 
 
-wire PCWrite_IF;
-
 wire [31:0] pc_IF;
 wire [31:0] pc_next_IF;
 wire [31:0] inst_IF;
 
 
+wire PCWrite_ID;
 wire Stall_ID;
 wire Flush_ID;
 wire Branch_ID;
@@ -26,6 +25,11 @@ wire [1:0] ALUOp_ID;
 
 reg [31:0] inst_ID;
 reg [31:0] pc_ID;
+wire [6:0] opcode_ID;
+wire [9:0] funct_ID;
+wire [4:0] rd_ID;
+wire [4:0] rs1_ID;
+wire [4:0] rs2_ID;
 wire [31:0] rs1_data_ID;
 wire [31:0] rs2_data_ID;
 wire [31:0] imm_ID;
@@ -89,7 +93,7 @@ PC PC(
     .clk_i(clk),
     .rst_i(rst),
     .start_i(start),
-    .PCWrite_i(PCWrite_IF),
+    .PCWrite_i(PCWrite_ID),
     .pc_i(pc_next_IF),
     .pc_o(pc_IF)
 );
@@ -104,20 +108,35 @@ Instruction_Memory Instruction_Memory(
 /// ID Stage ///
 ////////////////
 assign Flush_ID = Branch_ID & (rs1_data_ID == rs2_data_ID);
-
 assign branch_target_ID = (imm_ID << 1) + pc_ID;
+
+assign opcode_ID = inst_ID[6:0];
+assign funct_ID = {inst_ID[31:25], inst_ID[14:12]};
+assign rd_ID = inst_ID[11:7];
+assign rs1_ID = inst_ID[19:15];
+assign rs2_ID = inst_ID[24:20];
 
 // IF/ID Register
 always @(posedge clk) begin
-    if (!Stall_ID) begin
-        pc_ID    <= pc_IF;
-        inst_ID  <= inst_IF;
+    if (rst) begin
+        pc_ID <= 32'h00000000;
+        inst_ID <= 32'h00000013; // nop
+    end
+    else begin
+        if (Stall_ID) begin
+            pc_ID    <= pc_ID;
+            inst_ID  <= inst_ID;
+        end
+        else begin
+            pc_ID    <= pc_IF;
+            inst_ID  <= inst_IF;
+        end
     end
     // if (Flush);
 end
 
 Control Control(
-    .Opcode_i(inst_ID[6:0]),
+    .Opcode_i(opcode_ID),
     .RegWrite_o(RegWrite_ID),
     .MemToReg_o(MemToReg_ID),
     .MemRead_o(MemRead_ID),
@@ -128,11 +147,15 @@ Control Control(
 );
 
 // Hazard_Detection Hazard_Detection(
-//
+assign PCWrite_ID = 1; // debug only
+assign Stall_ID = 0; // debug only
 // );
+
 // Forward(
-//
+assign Forward_A = 0; // debug only
+assign Forward_B = 0; // debug only
 // );
+
 
 Imm_Gen Imm_Gen(
     .Inst_i(inst_ID),
@@ -142,9 +165,9 @@ Imm_Gen Imm_Gen(
 Registers Registers(
     .clk_i(clk),
     .RegWrite_i(RegWrite_WB),
-    .RDaddr_i(inst_ID[11:7]),
-    .RS1addr_i(inst_ID[19:15]),
-    .RS2addr_i(inst_ID[24:20]),
+    .RDaddr_i(rd_WB),
+    .RS1addr_i(rs1_ID),
+    .RS2addr_i(rs2_ID),
     .RDdata_i(write_back_data_WB),
     .RS1data_o(rs1_data_ID),
     .RS2data_o(rs2_data_ID)
@@ -158,19 +181,36 @@ Registers Registers(
 
 // ID/EX Register
 always @(posedge clk) begin
-    RegWrite_EX <= RegWrite_ID;
-    MemToReg_EX <= MemToReg_ID;
-    MemRead_EX  <= MemRead_ID;
-    MemWrite_EX <= MemWrite_ID;
-    ALUOp_EX    <= ALUOp_ID;
-    ALUSrc_EX   <= ALUSrc_ID;
-    rs1_data_EX <= rs1_data_ID;
-    rs2_data_EX <= rs2_data_ID;
-    imm_EX      <= imm_ID;
-    funct_EX    <= {inst_ID[31:25], inst_ID[14:12]};
-    rs1_EX      <= inst_ID[19:15];
-    rs2_EX      <= inst_ID[24:20];
-    rd_EX       <= inst_ID[11:7];
+    if (rst) begin
+        RegWrite_EX <= 0;
+        MemToReg_EX <= 0;
+        MemRead_EX  <= 0;
+        MemWrite_EX <= 0;
+        ALUOp_EX    <= 0;
+        ALUSrc_EX   <= 0;
+        rs1_data_EX <= 0;
+        rs2_data_EX <= 0;
+        imm_EX      <= 0;
+        funct_EX    <= 0;
+        rs1_EX      <= 0;
+        rs2_EX      <= 0;
+        rd_EX       <= 0;
+    end
+    else begin
+        RegWrite_EX <= RegWrite_ID;
+        MemToReg_EX <= MemToReg_ID;
+        MemRead_EX  <= MemRead_ID;
+        MemWrite_EX <= MemWrite_ID;
+        ALUOp_EX    <= ALUOp_ID;
+        ALUSrc_EX   <= ALUSrc_ID;
+        rs1_data_EX <= rs1_data_ID;
+        rs2_data_EX <= rs2_data_ID;
+        imm_EX      <= imm_ID;
+        funct_EX    <= funct_ID;
+        rs1_EX      <= rs1_ID;
+        rs2_EX      <= rs2_ID;
+        rd_EX       <= rd_ID;
+    end
 end
 
 ALU_Control ALU_Control(
@@ -203,13 +243,24 @@ ALU ALU(
 
 // EX/MEM Register
 always @(posedge clk) begin
-    RegWrite_MEM    <= RegWrite_EX;
-    MemToReg_MEM    <= MemToReg_EX;
-    MemRead_MEM     <= MemRead_EX;
-    MemWrite_MEM    <= MemWrite_EX;
-    alu_res_MEM     <= alu_res_EX;
-    data_stored_MEM <= rs2_data_EX;
-    rd_MEM          <= rd_EX;
+    if (rst) begin
+        RegWrite_MEM    <= 0;
+        MemToReg_MEM    <= 0;
+        MemRead_MEM     <= 0;
+        MemWrite_MEM    <= 0;
+        alu_res_MEM     <= 0;
+        data_stored_MEM <= 0;
+        rd_MEM          <= 0;
+    end
+    else begin
+        RegWrite_MEM    <= RegWrite_EX;
+        MemToReg_MEM    <= MemToReg_EX;
+        MemRead_MEM     <= MemRead_EX;
+        MemWrite_MEM    <= MemWrite_EX;
+        alu_res_MEM     <= alu_res_EX;
+        data_stored_MEM <= rs2_data_EX;
+        rd_MEM          <= rd_EX;
+    end
 end
 
 Data_Memory Data_Memory(
@@ -229,11 +280,20 @@ Data_Memory Data_Memory(
 
 // MEM/WB Register
 always @(posedge clk) begin
-    RegWrite_WB    <= RegWrite_MEM;
-    MemToReg_WB    <= MemToReg_MEM;
-    alu_res_WB     <= alu_res_MEM;
-    data_loaded_WB <= data_loaded_MEM;
-    rd_WB          <= rd_MEM;
+    if (rst) begin
+        RegWrite_WB    <= 0;
+        MemToReg_WB    <= 0;
+        alu_res_WB     <= 0;
+        data_loaded_WB <= 0;
+        rd_WB          <= 0;
+    end
+    else begin
+        RegWrite_WB    <= RegWrite_MEM;
+        MemToReg_WB    <= MemToReg_MEM;
+        alu_res_WB     <= alu_res_MEM;
+        data_loaded_WB <= data_loaded_MEM;
+        rd_WB          <= rd_MEM;
+    end
 end
 
 assign write_back_data_WB = MemToReg_WB ? data_loaded_WB : alu_res_WB;

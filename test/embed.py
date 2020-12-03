@@ -7,12 +7,41 @@ import re
 
 from common import instructions
 
+
+info = []
+
+info.append('printf("cycle = %d, Start = %0d, Stall = %0d, Flush = %0d\\nPC = %d\\n", (++counter), Start, stall, flush, (pc+=4));\n')
+
+# print Registers
+info.append('printf("Registers\\n");\n')
+info.append('printf("x0 = %10d, x8  = %10d, x16 = %10d, x24 = %10d\\n", x0, x8 , x16, x24);\n')
+info.append('printf("x1 = %10d, x9  = %10d, x17 = %10d, x25 = %10d\\n", x1, x9 , x17, x25);\n')
+info.append('printf("x2 = %10d, x10 = %10d, x18 = %10d, x26 = %10d\\n", x2, x10, x18, x26);\n')
+info.append('printf("x3 = %10d, x11 = %10d, x19 = %10d, x27 = %10d\\n", x3, x11, x19, x27);\n')
+info.append('printf("x4 = %10d, x12 = %10d, x20 = %10d, x28 = %10d\\n", x4, x12, x20, x28);\n')
+info.append('printf("x5 = %10d, x13 = %10d, x21 = %10d, x29 = %10d\\n", x5, x13, x21, x29);\n')
+info.append('printf("x6 = %10d, x14 = %10d, x22 = %10d, x30 = %10d\\n", x6, x14, x22, x30);\n')
+info.append('printf("x7 = %10d, x15 = %10d, x23 = %10d, x31 = %10d\\n", x7, x15, x23, x31);\n')
+
+# print Data Memory
+info.append('printf("Data Memory: 0x00 = %10d\\n", memory[0]);\n')
+info.append('printf("Data Memory: 0x04 = %10d\\n", memory[1]);\n')
+info.append('printf("Data Memory: 0x08 = %10d\\n", memory[2]);\n')
+info.append('printf("Data Memory: 0x0C = %10d\\n", memory[3]);\n')
+info.append('printf("Data Memory: 0x10 = %10d\\n", memory[4]);\n')
+info.append('printf("Data Memory: 0x14 = %10d\\n", memory[5]);\n')
+info.append('printf("Data Memory: 0x18 = %10d\\n", memory[6]);\n')
+info.append('printf("Data Memory: 0x1C = %10d\\n", memory[7]);\n')
+
+info.append('printf("\\n\\n");\n')
+
+
 res = []
 res.append('#include <stdio.h>\n')
 res.append('int main() {\n')
 
 # Global variables 
-res.append('int pc = -4;\n')
+res.append('int pc = -8;\n')
 res.append('int counter = -1;\n')
 res.append('int Start = 1;\n')
 res.append('int stall = 1;\n')
@@ -25,6 +54,9 @@ res.append(';\n')
 
 # Memory
 res.append('int memory[8] = {5};\n')
+
+# First few cycles in pipelined CPU don't show changes
+res += info * 5
 
 for ln in sys.stdin.readlines():
     inst_name, *ops = ln.strip(')\n').replace(',', ' ').replace('(', ' ').split()
@@ -54,30 +86,7 @@ for ln in sys.stdin.readlines():
         imm = ops[1]
         rs1 = ops[2]
 
-    res.append('printf("cycle = %d, Start = %0d, Stall = %0d, Flush = %0d\\nPC = %d\\n", (++counter), Start, stall, flush, (pc+=4));\n')
-
-    # print Registers
-    res.append('printf("Registers\\n");\n')
-    res.append('printf("x0 = %10d, x8  = %10d, x16 = %10d, x24 = %10d\\n", x0, x8 , x16, x24);\n')
-    res.append('printf("x1 = %10d, x9  = %10d, x17 = %10d, x25 = %10d\\n", x1, x9 , x17, x25);\n')
-    res.append('printf("x2 = %10d, x10 = %10d, x18 = %10d, x26 = %10d\\n", x2, x10, x18, x26);\n')
-    res.append('printf("x3 = %10d, x11 = %10d, x19 = %10d, x27 = %10d\\n", x3, x11, x19, x27);\n')
-    res.append('printf("x4 = %10d, x12 = %10d, x20 = %10d, x28 = %10d\\n", x4, x12, x20, x28);\n')
-    res.append('printf("x5 = %10d, x13 = %10d, x21 = %10d, x29 = %10d\\n", x5, x13, x21, x29);\n')
-    res.append('printf("x6 = %10d, x14 = %10d, x22 = %10d, x30 = %10d\\n", x6, x14, x22, x30);\n')
-    res.append('printf("x7 = %10d, x15 = %10d, x23 = %10d, x31 = %10d\\n", x7, x15, x23, x31);\n')
-
-    # print Data Memory
-    res.append('printf("Data Memory: 0x00 = %10d\\n", memory[0]);\n')
-    res.append('printf("Data Memory: 0x04 = %10d\\n", memory[1]);\n')
-    res.append('printf("Data Memory: 0x08 = %10d\\n", memory[2]);\n')
-    res.append('printf("Data Memory: 0x0C = %10d\\n", memory[3]);\n')
-    res.append('printf("Data Memory: 0x10 = %10d\\n", memory[4]);\n')
-    res.append('printf("Data Memory: 0x14 = %10d\\n", memory[5]);\n')
-    res.append('printf("Data Memory: 0x18 = %10d\\n", memory[6]);\n')
-    res.append('printf("Data Memory: 0x1C = %10d\\n", memory[7]);\n')
-
-    res.append('printf("\\n\\n");\n')
+    res += info
 
     # Evaluate instructions
     res.append('asm volatile(\n')
