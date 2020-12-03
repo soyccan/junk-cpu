@@ -3,6 +3,7 @@
     The C source code can be compiled and executed in the docker container
 """
 import sys
+import re
 
 from common import instructions
 
@@ -23,25 +24,35 @@ res += [',x{}=0'.format(i) for i in range(1, 32)]
 res.append(';\n')
 
 # Memory
-res.append('int memory[8] = {0};\n')
+res.append('int memory[8] = {5};\n')
 
 for ln in sys.stdin.readlines():
-    inst_name, rd, rs1, *rs2 = ln.strip('\n').split(' ')
+    inst_name, *ops = ln.strip(')\n').replace(',', ' ').replace('(', ' ').split()
     inst = instructions[inst_name]
 
     if inst['type'] == 'r':
-        rd = rd[:-1]
-        rs1 = rs1[:-1]
-        rs2 = rs2[0]
+        rd = ops[0]
+        rs1 = ops[1]
+        rs2 = ops[2]
 
     elif inst['type'] == 'i':
-        rd = rd[:-1]
-        rs1 = rs1[:-1]
-        imm = rs2[0]
+        if inst_name in ('lb', 'lh', 'lw', 'ld'):
+            rd = ops[0]
+            imm = ops[1]
+            rs1 = ops[2]
+        else:
+            rd = ops[0]
+            rs1 = ops[1]
+            imm = ops[2]
 
     elif inst['type'] == 'u':
-        rd = rd[:-1]
-        imm = rs1
+        rd = ops[0]
+        imm = ops[1]
+
+    elif inst['type'] == 's':
+        rs2 = ops[0]
+        imm = ops[1]
+        rs1 = ops[2]
 
     res.append('printf("cycle = %d, Start = %0d, Stall = %0d, Flush = %0d\\nPC = %d\\n", (++counter), Start, stall, flush, (pc+=4));\n')
 
@@ -71,39 +82,25 @@ for ln in sys.stdin.readlines():
     # Evaluate instructions
     res.append('asm volatile(\n')
     if inst['type'] == 'r':
-        res.append('"{} %[_{}], %[_{}], %[_{}]\\n\\t"\n'.format(
-            inst_name, rd, rs1, rs2))
+        res.append('"{} %[_rd], %[_rs1], %[_rs2]\\n\\t"\n'.format(inst_name))
+        res.append(': [_rd] "=r" ({})\n'.format(rd))
+        res.append(': [_rs1] "r" ({}), [_rs2] "r" ({})\n'.format(rs1, rs2))
     elif inst['type'] == 'i':
-        res.append('"{} %[_{}], %[_{}], {}\\n\\t"\n'.format(
-            inst_name, rd, rs1, imm))
-    elif inst['type'] == 'u':
-        res.append('"{} %[_{}], {}\\n\\t"\n'.format(inst_name, rd, imm))
-    else:
-        raise ValueError()
-
-    if inst['type'] == 'r':
-        if rd == rs1 == rs2:
-            res.append(': [_{}] "+r" ({})\n'.format(rd, rd))
-        elif rd == rs1:
-            res.append(': [_{}] "+r" ({})\n'.format(rd, rd))
-            res.append(': [_{}] "r" ({})\n'.format(rs2, rs2))
-        elif rd == rs2:
-            res.append(': [_{}] "+r" ({})\n'.format(rd, rd))
-            res.append(': [_{}] "r" ({})\n'.format(rs1, rs1))
-        elif rs1 == rs2:
-            res.append(': [_{}] "=r" ({})\n'.format(rd, rd))
-            res.append(': [_{}] "r" ({})\n'.format(rs1, rs1))
+        if inst_name in ('lb', 'lh', 'lw', 'ld'):
+            res.append('"{} %[_rd], {}(%[_rs1])\\n\\t"\n'.format(inst_name, imm))
+            res.append(': [_rd] "=r" ({})\n'.format(rd))
+            res.append(': [_rs1] "r" (memory+{})\n'.format(rs1))
         else:
-            res.append(': [_{}] "=r" ({})\n'.format(rd, rd))
-            res.append(': [_{}] "r" ({}), [_{}] "r" ({})\n'.format(rs1, rs1, rs2, rs2))
-    elif inst['type'] == 'i':
-        if rd == rs1:
-            res.append(': [_{}] "+r" ({})\n'.format(rd, rd))
-        else:
-            res.append(': [_{}] "=r" ({})\n'.format(rd, rd))
-            res.append(': [_{}] "r" ({})\n'.format(rs1, rs1))
+            res.append('"{} %[_rd], %[_rs1], {}\\n\\t"\n'.format(inst_name, imm))
+            res.append(': [_rd] "=r" ({})\n'.format(rd))
+            res.append(': [_rs1] "r" ({})\n'.format(rs1))
     elif inst['type'] == 'u':
-        res.append(': [_{}] "=r" ({})\n'.format(rd, rd))
+        res.append('"{} %[_rd], {}\\n\\t"\n'.format(inst_name, imm))
+        res.append(': [_rd] "=r" ({})\n'.format(rd))
+    elif inst['type'] == 's':
+        res.append('"{} %[_rs2], {}(%[_rs1])\\n\\t"\n'.format(inst_name, imm))
+        res.append(':\n')
+        res.append(': [_rs1] "r" (memory+{}), [_rs2] "r" ({})\n'.format(rs1, rs2))
     else:
         raise ValueError()
     res.append(');\n')

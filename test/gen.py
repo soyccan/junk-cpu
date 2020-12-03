@@ -23,22 +23,30 @@ for i in range(num_inst):
                                                str(rs2)))
 
     elif inst['type'] == 'i':
-        if inst_name in ('srai',):
+        if inst_name in ('slli', 'srli', 'srai'):
             res.append('{} x{}, x{}, {}\n'.format(inst_name,
                                                   str(rd),
                                                   str(rs1),
                                                   str(shft_amt)))
+        elif inst_name in ('lb', 'lh', 'lw', 'ld'):
+            res.append('{} x{}, {}(x{})\n'.format(inst_name,
+                                                 str(rd),
+                                                 str(imm),
+                                                 str(rs1)))
         else:
             res.append('{} x{}, x{}, {}\n'.format(inst_name,
                                                   str(rd),
                                                   str(rs1),
                                                   str(imm)))
-
     elif inst['type'] == 'u':
         res.append('{} x{}, {}\n'.format(inst_name,
                                          str(rd),
                                          str(upper_val)))
-
+    elif inst['type'] == 's':
+        res.append('{} x{}, {}(x{})\n'.format(inst_name,
+                                             str(rs2),
+                                             str(imm),
+                                             str(rs1)))
     else:
         raise Exception('Unsupported instruction!')
 

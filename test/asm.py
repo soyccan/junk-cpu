@@ -1,3 +1,4 @@
+#!python3
 """ Assemble instructions
     Output machine code in binary string,
     keeping readable instructions as comment
