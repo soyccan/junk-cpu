@@ -16,6 +16,7 @@
 
 `define ALU_OP_REG 2'd0  // R-type instruction
 `define ALU_OP_IMM 2'd1  // I-type instruction
+`define ALU_OP_STR 2'd2  // S-type instruction
 
 
 

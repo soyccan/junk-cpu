@@ -20,6 +20,11 @@ always @* begin  // latch-free design
             {3'b000}: ALUCtl_o = `ALU_CTL_ADD;  // addi
             {3'b101}: ALUCtl_o = `ALU_CTL_SRA;  // srai
         endcase
+
+        `ALU_OP_STR:
+        case (Funct_i[2:0])
+            {3'b010}: ALUCtl_o = `ALU_CTL_ADD;  // sw
+        endcase
     endcase
 end
 

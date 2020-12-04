@@ -110,7 +110,11 @@ Instruction_Memory Instruction_Memory(
 assign Flush_ID = Branch_ID & (rs1_data_ID == rs2_data_ID);
 assign branch_target_ID = (imm_ID << 1) + pc_ID;
 
+// TODO: Valid instructions start with 11
+// An empty entity in instruction memory is replaced with no-op
+// assign opcode_ID = inst_ID[1:0] == 2'b11 ? inst_ID[6:0] : 7'h13;
 assign opcode_ID = inst_ID[6:0];
+
 assign funct_ID = {inst_ID[31:25], inst_ID[14:12]};
 assign rd_ID = inst_ID[11:7];
 assign rs1_ID = inst_ID[19:15];
@@ -119,24 +123,26 @@ assign rs2_ID = inst_ID[24:20];
 // IF/ID Register
 always @(posedge clk) begin
     if (rst) begin
-        pc_ID <= 32'h00000000;
-        inst_ID <= 32'h00000013; // nop
+        pc_ID   <= 32'h0;
+        inst_ID <= 32'h13; // nop
+    end
+    else if (Stall_ID) begin
+        pc_ID   <= pc_ID;
+        inst_ID <= inst_ID;
+    end
+    else if (Flush_ID) begin
+        pc_ID   <= 32'bx;
+        inst_ID <= 32'h13; // nop
     end
     else begin
-        if (Stall_ID) begin
-            pc_ID    <= pc_ID;
-            inst_ID  <= inst_ID;
-        end
-        else begin
-            pc_ID    <= pc_IF;
-            inst_ID  <= inst_IF;
-        end
+        pc_ID   <= pc_IF;
+        inst_ID <= inst_IF;
     end
-    // if (Flush);
 end
 
 Control Control(
     .Opcode_i(opcode_ID),
+    .NoOp_i(1'b0),
     .RegWrite_o(RegWrite_ID),
     .MemToReg_o(MemToReg_ID),
     .MemRead_o(MemRead_ID),

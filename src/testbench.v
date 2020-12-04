@@ -43,8 +43,7 @@ initial begin
     // [RegisterInitialization] DO NOT REMOVE THIS FLAG !!!
 
     // TODO: initialize your pipeline registers
-    // Issue nop in ID stage to initialize Control
-    // CPU.inst_ID = 32'h00000013;
+
 
     // Load instructions into instruction memory
     // Make sure you change back to "instruction.txt" before submission
