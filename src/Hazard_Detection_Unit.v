@@ -23,13 +23,13 @@ always @* begin
 	if((Rd_i == 1'b1) && ((Rd_i == Rs1_i) || (Rd_i == Rs2_i))) begin // lw Control Hazard
 		NoOp_o = 1'b1;
 		Stall_o = 1'b1;
-		PCWrite_o = 1'b1;
+		PCWrite_o = 1'b0;
 	end
 	
 	else begin // Exception
 		NoOp_o = 1'b0;
 		Stall_o = 1'b0;
-		PCWrite_o = 1'b0;
+		PCWrite_o = 1'b1;
 	end
 end
 

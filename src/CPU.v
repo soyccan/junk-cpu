@@ -1,3 +1,4 @@
+`include "Const.v"
 module CPU(input clk_i,
            input rst_i,
            input start_i);
@@ -237,14 +238,14 @@ ALU_Control ALU_Control(
     .ALUCtl_o(alu_ctl_EX)
 );
 
-assign alu_op1_EX = Forward_A == 2'b00 ? rs1_data_EX :
-                    Forward_A == 2'b01 ? write_back_data_WB :
-                    Forward_A == 2'b10 ? alu_res_MEM : 32'hxxxxxxxx;
+assign alu_op1_EX = Forward_A == `FW_Reg_src ? rs1_data_EX :
+                    Forward_A == `FW_MEM_src ? write_back_data_WB :
+                    Forward_A == `FW_EX_src  ? alu_res_MEM : 32'hxxxxxxxx;
 
 assign alu_op2_EX = ALUSrc_EX ? imm_EX :
-                    Forward_B == 2'b00 ? rs2_data_EX :
-                    Forward_B == 2'b01 ? write_back_data_WB :
-                    Forward_B == 2'b10 ? alu_res_MEM : 32'hxxxxxxxx;
+                    Forward_B == `FW_Reg_src ? rs2_data_EX :
+                    Forward_B == `FW_MEM_src ? write_back_data_WB :
+                    Forward_B == `FW_EX_src  ? alu_res_MEM : 32'hxxxxxxxx;
 
 ALU ALU(
     .ALUCtl_i(alu_ctl_EX),
