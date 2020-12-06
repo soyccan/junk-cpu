@@ -10,4 +10,5 @@ instructions = {
     'lui': {'type': 'u'} ,
     'lw': {'type': 'i'},
     'sw': {'type': 's'},
+	'beq': {'type': 'b'},
 }
