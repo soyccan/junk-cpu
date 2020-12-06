@@ -18,12 +18,18 @@
 `define ALU_OP_IMM 2'd1  // I-type instruction
 `define ALU_OP_STR 2'd2  // S-type instruction
 
+`define ALU_OP_STORE 2'd2 // S-type instruction
+`define ALU_OP_BRANCH 2'd3  // SB-type instruction
+
 
 
 // Forwarding Unit
 `define FW_Reg_src 2'b00
 `define FW_EX_src 2'b10
 `define FW_MEM_src 2'b01
+
+
+
 
 
 

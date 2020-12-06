@@ -12,6 +12,7 @@ wire [31:0] pc_next_IF;
 wire [31:0] inst_IF;
 
 
+wire NoOp_ID;
 wire PCWrite_ID;
 wire Stall_ID;
 wire Flush_ID;
@@ -142,20 +143,25 @@ end
 
 Control Control(
     .Opcode_i(opcode_ID),
-    .NoOp_i(1'b0),
+    .NoOp_i(NoOp_ID),
     .RegWrite_o(RegWrite_ID),
-    .MemToReg_o(MemToReg_ID),
+    .MemtoReg_o(MemToReg_ID),
     .MemRead_o(MemRead_ID),
     .MemWrite_o(MemWrite_ID),
     .ALUOp_o(ALUOp_ID),
     .ALUSrc_o(ALUSrc_ID),
-    .Branch_o(Branch_ID)
+    .branch_o(Branch_ID)
 );
 
-// Hazard_Detection Hazard_Detection(
-assign PCWrite_ID = 1; // debug only
-assign Stall_ID = 0; // debug only
-// );
+Hazard_Detection_Unit Hazard_Detection_Unit(
+    .MemRead_i(MemRead_EX),
+    .Rd_i(rd_EX),
+    .Rs1_i(rs1_ID),
+    .Rs2_i(rs2_ID),
+    .NoOp_o(NoOp_ID),
+    .Stall_o(Stall_ID),
+    .PCWrite_o(PCWrite_ID)
+);
 
 Forward Forward(
     .EX_rs1(rs1_EX),

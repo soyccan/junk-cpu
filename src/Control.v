@@ -1,31 +1,89 @@
+//*****************************************
+//
+//  Note:
+//    1. NoOp
+//    
+//    2. TODO: branch除branch_o之外的signal要理????
+//  
+//  Update Date: 2020/12/4
+//
+//*****************************************
 `include "Const.v"
-module Control(input  [6:0] Opcode_i,
-               input  NoOp_i,
-               output RegWrite_o,
-               output MemToReg_o,
-               output MemRead_o,
-               output MemWrite_o,
-               output [1:0] ALUOp_o,
-               output ALUSrc_o,
-               output Branch_o);
+module Control(input      [6:0] Opcode_i,
+			         input            NoOp_i,
+               output reg [1:0] ALUOp_o,
+               output reg       ALUSrc_o,
+               output reg       RegWrite_o,
+               output reg       MemtoReg_o,
+               output reg       MemRead_o,
+               output reg       MemWrite_o,
+               output reg       branch_o);
 
-// TODO: MemRead should not be don't care?
-assign {RegWrite_o, MemToReg_o, MemRead_o, MemWrite_o, ALUSrc_o, Branch_o} =
-        NoOp_i                     ? 6'b000000 :
-        Opcode_i == `OPCODE_OP     ? 6'b100000 :
-        Opcode_i == `OPCODE_IMM    ? 6'b100010 :
-        Opcode_i == `OPCODE_LOAD   ? 6'b111010 :
-        Opcode_i == `OPCODE_STORE  ? 6'b0x0110 :
-        Opcode_i == `OPCODE_BRANCH ? 6'b0x0001 :
-        6'bxxxxxx;
+always @* begin
+  case (NoOp_i)
+    1'b0: begin
+      case (Opcode_i)
+          7'b0110011: begin //R-type arithmetic
+          	ALUOp_o = `ALU_OP_REG;
+          	ALUSrc_o = 1'b0;
+          	RegWrite_o = 1'b1;
+          	MemtoReg_o = 1'b0;
+          	MemRead_o = 1'b0;
+          	MemWrite_o = 1'b0;
+          	branch_o = 1'b0;
+          end
+          
+          7'b0010011: begin //I-type arithmetic
+          	ALUOp_o = `ALU_OP_IMM;
+          	ALUSrc_o = 1'b1;
+          	RegWrite_o = 1'b1;
+          	MemtoReg_o = 1'b0;
+          	MemRead_o = 1'b0;
+          	MemWrite_o = 1'b0;
+          	branch_o = 1'b0;
+          end 
+          
+          7'b0000011: begin // lw instruction
+          	ALUOp_o = `ALU_OP_IMM;
+          	ALUSrc_o = 1'b1;
+            RegWrite_o = 1'b1;
+            MemtoReg_o = 1'b1;
+            MemRead_o = 1'b1;
+            MemWrite_o = 1'b0;
+            branch_o = 1'b0;
+          end 
+          
+          7'b0100011: begin // S-type
+            ALUOp_o = `ALU_OP_STORE;
+            ALUSrc_o = 1'b1;
+            RegWrite_o = 1'b0;
+            //MemtoReg_o = 1'b1;
+            MemRead_o = 1'b0;
+            MemWrite_o = 1'b1;
+            branch_o = 1'b0;
+          end
+          
+          7'b1100011: begin // SB-type  TODO: except for branch_o, others needed?
+            ALUOp_o = `ALU_OP_BRANCH;
+            ALUSrc_o = 1'b0;
+            RegWrite_o = 1'b0;
+            //MemtoReg_o = 1'b1;
+            MemRead_o = 1'b0;
+            MemWrite_o = 1'b0;
+            branch_o = 1'b1;
+          end 
+      endcase
+    end
 
-assign ALUOp_o =
-        NoOp_i                     ? 2'bxx       :
-        Opcode_i == `OPCODE_OP     ? `ALU_OP_REG :
-        Opcode_i == `OPCODE_IMM    ? `ALU_OP_IMM :
-        Opcode_i == `OPCODE_LOAD   ? `ALU_OP_IMM :
-        Opcode_i == `OPCODE_STORE  ? `ALU_OP_STR :
-        Opcode_i == `OPCODE_BRANCH ? `ALU_OP_REG :
-        2'bxx;
+    1'b1: begin// NoOp = 1  
+      ALUSrc_o = 1'b0;
+      RegWrite_o = 1'b0;
+      MemRead_o = 1'b0;
+      MemWrite_o = 1'b0;
+      branch_o = 1'b0;
+      //do nothing?
+    end  
+  endcase  
+end
 
 endmodule
