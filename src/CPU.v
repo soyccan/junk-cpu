@@ -44,8 +44,8 @@ reg MemWrite_EX;
 reg ALUSrc_EX;
 reg [1:0] ALUOp_EX;
 
-wire Forward_A;
-wire Forward_B;
+wire [1:0] Forward_A;
+wire [1:0] Forward_B;
 
 reg [9:0] funct_EX;
 reg [4:0] rs1_EX;
@@ -157,10 +157,16 @@ assign PCWrite_ID = 1; // debug only
 assign Stall_ID = 0; // debug only
 // );
 
-// Forward(
-assign Forward_A = 0; // debug only
-assign Forward_B = 0; // debug only
-// );
+Forward Forward(
+    .EX_rs1(rs1_EX),
+    .EX_rs2(rs2_EX),
+    .MEM_rd(rd_MEM),
+    .WB_rd(rd_WB),
+    .MEM_regwrite(RegWrite_MEM),
+    .WB_regwrite(RegWrite_WB),
+    .Forward_A(Forward_A),
+    .Forward_B(Forward_B)
+);
 
 
 Imm_Gen Imm_Gen(

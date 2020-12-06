@@ -20,6 +20,13 @@
 
 
 
+// Forwarding Unit
+`define FW_Reg_src 2'b00
+`define FW_EX_src 2'b10
+`define FW_MEM_src 2'b01
+
+
+
 // Funct3 and Funct7 follows RISC-V spec
 // `define FUNCT7_ADD  7'b0000000
 // `define FUNCT7_SLT  7'b0000000
