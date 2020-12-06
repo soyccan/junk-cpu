@@ -59,6 +59,7 @@ reg [31:0] imm_EX;
 
 wire [31:0] alu_op1_EX;
 wire [31:0] alu_op2_EX;
+wire [31:0] rs2_fwd_EX;
 wire [31:0] alu_res_EX;
 wire [3:0] alu_ctl_EX;
 
@@ -242,8 +243,9 @@ assign alu_op1_EX = Forward_A == `FW_Reg_src ? rs1_data_EX :
                     Forward_A == `FW_MEM_src ? write_back_data_WB :
                     Forward_A == `FW_EX_src  ? alu_res_MEM : 32'hxxxxxxxx;
 
-assign alu_op2_EX = ALUSrc_EX ? imm_EX :
-                    Forward_B == `FW_Reg_src ? rs2_data_EX :
+assign alu_op2_EX = ALUSrc_EX ? imm_EX : rs2_fwd_EX;
+
+assign rs2_fwd_EX = Forward_B == `FW_Reg_src ? rs2_data_EX :
                     Forward_B == `FW_MEM_src ? write_back_data_WB :
                     Forward_B == `FW_EX_src  ? alu_res_MEM : 32'hxxxxxxxx;
 
@@ -277,7 +279,7 @@ always @(posedge clk) begin
         MemRead_MEM     <= MemRead_EX;
         MemWrite_MEM    <= MemWrite_EX;
         alu_res_MEM     <= alu_res_EX;
-        data_stored_MEM <= rs2_data_EX;
+        data_stored_MEM <= rs2_fwd_EX;
         rd_MEM          <= rd_EX;
     end
 end

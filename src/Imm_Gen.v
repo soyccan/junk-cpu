@@ -11,7 +11,7 @@ assign Imm_o =
     opcode == `OPCODE_STORE ?
             {{20{Inst_i[31]}}, Inst_i[31:25], Inst_i[11:7]} :
     opcode == `OPCODE_BRANCH ?
-            {{19{Inst_i[31]}}, Inst_i[31], Inst_i[7], Inst_i[30:25], Inst_i[11:8], 1'b0} :
+            {{20{Inst_i[31]}}, Inst_i[31], Inst_i[7], Inst_i[30:25], Inst_i[11:8]} :
     32'hxxxxxxxx;
 
 endmodule

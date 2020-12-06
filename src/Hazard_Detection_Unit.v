@@ -20,7 +20,7 @@ module Hazard_Detection_Unit(input             MemRead_i,
 							 output reg        Stall_o,
 							 output reg        PCWrite_o);
 always @* begin
-	if((Rd_i == 1'b1) && ((Rd_i == Rs1_i) || (Rd_i == Rs2_i))) begin // lw Control Hazard
+	if((MemRead_i == 1'b1) && ((Rd_i == Rs1_i) || (Rd_i == Rs2_i))) begin // lw Control Hazard
 		NoOp_o = 1'b1;
 		Stall_o = 1'b1;
 		PCWrite_o = 1'b0;

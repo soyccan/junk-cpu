@@ -30,7 +30,7 @@ always @* begin
     if(WB_regwrite & WB_rd != 0 & WB_rd == EX_rs1 & Forward_A != `FW_EX_src) begin
         Forward_A = `FW_MEM_src;
     end
-    if(WB_regwrite & WB_rd != 0 & WB_rd == EX_rs2 & Forward_A != `FW_EX_src) begin
+    if(WB_regwrite & WB_rd != 0 & WB_rd == EX_rs2 & Forward_B != `FW_EX_src) begin
         Forward_B = `FW_MEM_src;
     end
 end
