@@ -6,7 +6,7 @@ module Imm_Gen(input  [31:0] Inst_i,
 wire [6:0] opcode = Inst_i[6:0];
 
 assign Imm_o =
-    (opcode == `OPCODE_IMM || opcode == `OPCODE_LOAD) ?
+    (opcode == `OPCODE_OP_IMM || opcode == `OPCODE_LOAD) ?
             {{20{Inst_i[31]}}, Inst_i[31:20]} :
     opcode == `OPCODE_STORE ?
             {{20{Inst_i[31]}}, Inst_i[31:25], Inst_i[11:7]} :

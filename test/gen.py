@@ -20,7 +20,7 @@ for i in range(num_inst):
         rs2 = 0
     rd = random.randint(5, 10)
     imm = random.randint(-(1 << 11), (1 << 11)-1)
-    addr = random.randint(-5, 5)
+    addr = random.randint(0, 2) * 4
     shft_amt = random.randint(0, 31)
     upper_val = random.randint(0, (1 << 20) - 1)
     branch_target = random.randint(-pc, (num_inst-1) * 4 - pc) // 2
@@ -41,7 +41,7 @@ for i in range(num_inst):
         elif inst_name in ('lb', 'lh', 'lw', 'ld'):
             res.append('{} x{}, {}(x{})\n'.format(inst_name,
                                                  str(rd),
-                                                 str(imm),
+                                                 str(addr),
                                                  str(rs1)))
         else:
             res.append('{} x{}, x{}, {}\n'.format(inst_name,
@@ -59,7 +59,7 @@ for i in range(num_inst):
     elif inst['type'] == 's':
         res.append('{} x{}, {}(x{})\n'.format(inst_name,
                                              str(rs2),
-                                             str(imm),
+                                             str(addr),
                                              str(rs1)))
     elif inst['type'] == 'b':
         res.append('{} x{}, x{}, {}\n'.format(inst_name,

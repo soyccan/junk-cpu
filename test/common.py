@@ -7,8 +7,8 @@ instructions = {
     'mul': {'type': 'r'},
     'addi': {'type': 'i'},
     'srai': {'type': 'i'},
-    'lui': {'type': 'u'} ,
     'lw': {'type': 'i'},
     'sw': {'type': 's'},
-	'beq': {'type': 'b'},
+    #  'beq': {'type': 'b'},
+    #  'lui': {'type': 'u'} ,
 }

@@ -70,32 +70,11 @@
 
 
 // OPCODE follows RISC-V spec
-// `define OPCODE_BASE_OP_IMM32 7'b0111011
 `define OPCODE_OP            7'b0110011
-`define OPCODE_IMM           7'b0010011
+`define OPCODE_OP_IMM        7'b0010011
 `define OPCODE_LOAD          7'b0000011
 `define OPCODE_STORE         7'b0100011
 `define OPCODE_BRANCH        7'b1100011
-// `define OPCODE_LUI           7'b0110111
-// `define OPCODE_JALR          7'b1100111
-// `define OPCODE_JAL           7'b1101111
-// `define OPCODE_ADD           OPCODE_BASE_OP
-// `define OPCODE_SLT           OPCODE_BASE_OP
-// `define OPCODE_SLTU          OPCODE_BASE_OP
-// `define OPCODE_AND           OPCODE_BASE_OP
-// `define OPCODE_OR            OPCODE_BASE_OP
-// `define OPCODE_XOR           OPCODE_BASE_OP
-// `define OPCODE_SLL           OPCODE_BASE_OP
-// `define OPCODE_SRL           OPCODE_BASE_OP
-// `define OPCODE_SUB           OPCODE_BASE_OP
-// `define OPCODE_SRA           OPCODE_BASE_OP
-// `define OPCODE_MUL           OPCODE_BASE_OP
-// `define OPCODE_ADDI          OPCODE_BASE_OP_IMM
-// `define OPCODE_SLTI          OPCODE_BASE_OP_IMM
-// `define OPCODE_SLTIU         OPCODE_BASE_OP_IMM
-// `define OPCODE_ANDI          OPCODE_BASE_OP_IMM
-// `define OPCODE_ORI           OPCODE_BASE_OP_IMM
-// `define OPCODE_XORI          OPCODE_BASE_OP_IMM
-// `define OPCODE_SLLI          OPCODE_BASE_OP_IMM
-// `define OPCODE_SRLI          OPCODE_BASE_OP_IMM
-// `define OPCODE_SRAI          OPCODE_BASE_OP_IMM
+`define OPCODE_LUI           7'b0110111
+`define OPCODE_JALR          7'b1100111
+`define OPCODE_JAL           7'b1101111

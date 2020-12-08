@@ -6,8 +6,8 @@ unzip -jo ../ta/CA2020_project1.zip
 unzip -jo ../ta/CA2020_project1_testdata.zip
 
 # Files in src/ has priority
-for f in $(ls ../src/); do
-    rm "$f"
+for f in ../src/*; do
+    rm -f "${f#../src/}"
 done
 
 iverilog -o cpu.out -I ../src *.v ../src/*.v
