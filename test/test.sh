@@ -3,7 +3,6 @@
 set -ex
 
 unzip -jo ../ta/CA2020_project1.zip
-unzip -jo ../ta/CA2020_project1_testdata.zip
 
 # Files in src/ has priority
 for f in ../src/*; do
@@ -22,9 +21,9 @@ while true; do
 
     # Run by JunkCPU
     python ../test/asm.py <a.s >instruction.txt
-    ./cpu.out
+    ./cpu.out >/dev/null
 
-    if ! diff -w a.log output.txt >/dev/null; then
+    if ! python ../test/diff.py output.txt a.log >/dev/null; then
         echo !!!!!!!!!!!!!!!!!
         echo Output Different!
         echo !!!!!!!!!!!!!!!!!

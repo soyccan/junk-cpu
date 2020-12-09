@@ -158,6 +158,7 @@ Control Control(
 Hazard_Detection_Unit Hazard_Detection_Unit(
     .MemRead_i(MemRead_EX),
     .Rd_i(rd_EX),
+    .Opcode_i(opcode_ID),
     .Rs1_i(rs1_ID),
     .Rs2_i(rs2_ID),
     .NoOp_o(NoOp_ID),

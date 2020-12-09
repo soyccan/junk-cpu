@@ -24,14 +24,14 @@ info.append('printf("x6 = %10d, x14 = %10d, x22 = %10d, x30 = %10d\\n", x6, x14,
 info.append('printf("x7 = %10d, x15 = %10d, x23 = %10d, x31 = %10d\\n", x7, x15, x23, x31);\n')
 
 # print Data Memory
-info.append('printf("Data Memory: 0x00 = %10d\\n", memory[0]);\n')
-info.append('printf("Data Memory: 0x04 = %10d\\n", memory[1]);\n')
-info.append('printf("Data Memory: 0x08 = %10d\\n", memory[2]);\n')
-info.append('printf("Data Memory: 0x0C = %10d\\n", memory[3]);\n')
-info.append('printf("Data Memory: 0x10 = %10d\\n", memory[4]);\n')
-info.append('printf("Data Memory: 0x14 = %10d\\n", memory[5]);\n')
-info.append('printf("Data Memory: 0x18 = %10d\\n", memory[6]);\n')
-info.append('printf("Data Memory: 0x1C = %10d\\n", memory[7]);\n')
+info.append('printf("Data Memory: 0x00 = %10u\\n", memory[0]);\n')
+info.append('printf("Data Memory: 0x04 = %10u\\n", memory[1]);\n')
+info.append('printf("Data Memory: 0x08 = %10u\\n", memory[2]);\n')
+info.append('printf("Data Memory: 0x0C = %10u\\n", memory[3]);\n')
+info.append('printf("Data Memory: 0x10 = %10u\\n", memory[4]);\n')
+info.append('printf("Data Memory: 0x14 = %10u\\n", memory[5]);\n')
+info.append('printf("Data Memory: 0x18 = %10u\\n", memory[6]);\n')
+info.append('printf("Data Memory: 0x1C = %10u\\n", memory[7]);\n')
 
 info.append('printf("\\n\\n");\n')
 
@@ -56,7 +56,7 @@ res += [',x{}=0'.format(i) for i in range(1, 32)]
 res.append(';\n')
 
 # Memory
-res.append('int memory[4096] = {5};\n')
+res.append('unsigned int memory[4096] = {5};\n')
 
 # First few cycles in pipelined CPU don't show changes
 res += info * 4
@@ -95,7 +95,6 @@ for ln in sys.stdin.readlines():
         branch_target = ops[2]
 
     # Evaluate instructions
-    res.append('x0=0;\n') # x0 is always zero
     if inst['type'] == 'r':
         res += info
         res.append('asm volatile(\n')
@@ -149,6 +148,7 @@ for ln in sys.stdin.readlines():
         res.append(');\n')
     else:
         raise ValueError()
+    res.append('x0=0;\n') # x0 is always zero
     pc += 4
 
 res += info

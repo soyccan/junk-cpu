@@ -19,18 +19,18 @@ always @* begin
     Forward_B = `FW_Reg_src;
 
     // EX hazard
-    if(MEM_regwrite & MEM_rd != 0 & MEM_rd == EX_rs1) begin
+    if(MEM_regwrite && MEM_rd != 0 && MEM_rd == EX_rs1) begin
         Forward_A = `FW_EX_src;
     end
-    if(MEM_regwrite & MEM_rd != 0 & MEM_rd == EX_rs2) begin
+    if(MEM_regwrite && MEM_rd != 0 && MEM_rd == EX_rs2) begin
         Forward_B = `FW_EX_src;
     end
 
     // MEM hazard
-    if(WB_regwrite & WB_rd != 0 & WB_rd == EX_rs1 & Forward_A != `FW_EX_src) begin
+    if(WB_regwrite && WB_rd != 0 && WB_rd == EX_rs1 && Forward_A != `FW_EX_src) begin
         Forward_A = `FW_MEM_src;
     end
-    if(WB_regwrite & WB_rd != 0 & WB_rd == EX_rs2 & Forward_B != `FW_EX_src) begin
+    if(WB_regwrite && WB_rd != 0 && WB_rd == EX_rs2 && Forward_B != `FW_EX_src) begin
         Forward_B = `FW_MEM_src;
     end
 end

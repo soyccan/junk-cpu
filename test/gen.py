@@ -12,13 +12,13 @@ dq = [-1, -1]
 for i in range(num_inst):
     inst_name = random.sample(instructions.keys(), 1)[0]
     inst = instructions[inst_name]
-    rs1 = random.randint(5, 10)
+    rs1 = random.randint(1, 3)
     if rs1 == dq[0] or rs1 == dq[1]: 
         rs1 = 0
-    rs2 = random.randint(5, 10)
+    rs2 = random.randint(1, 3)
     if rs2 == dq[0] or rs2 == dq[1]: 
         rs2 = 0
-    rd = random.randint(5, 10)
+    rd = random.randint(0, 1)
     imm = random.randint(-(1 << 11), (1 << 11)-1)
     addr = random.randint(0, 2) * 4
     shft_amt = random.randint(0, 31)
