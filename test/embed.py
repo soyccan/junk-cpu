@@ -36,11 +36,47 @@ info.append('printf("Data Memory: 0x1C = %10u\\n", memory[7]);\n')
 info.append('printf("\\n\\n");\n')
 
 
+
 res = []
 res.append('#include <stdio.h>\n')
 res.append('#define min(x, y) ( (x) < (y) ? (x) : (y) )\n')
 res.append('#define memory_addr(x) ((unsigned long)memory + min('
            '(x) & 0xfffffffc, sizeof(memory) - sizeof(int)))\n')
+
+# ABI names
+res.append('#define zero x0\n')
+res.append('#define ra   x1\n')
+res.append('#define sp   x2\n')
+res.append('#define gp   x3\n')
+res.append('#define tp   x4\n')
+res.append('#define t0   x5\n')
+res.append('#define t1   x6\n')
+res.append('#define t2   x7\n')
+res.append('#define s0   x8\n')
+res.append('#define s1   x9\n')
+res.append('#define a0   x10\n')
+res.append('#define a1   x11\n')
+res.append('#define a2   x12\n')
+res.append('#define a3   x13\n')
+res.append('#define a4   x14\n')
+res.append('#define a5   x15\n')
+res.append('#define a6   x16\n')
+res.append('#define a7   x17\n')
+res.append('#define s2   x18\n')
+res.append('#define s3   x19\n')
+res.append('#define s4   x20\n')
+res.append('#define s5   x21\n')
+res.append('#define s6   x22\n')
+res.append('#define s7   x23\n')
+res.append('#define s8   x24\n')
+res.append('#define s9   x25\n')
+res.append('#define s10  x26\n')
+res.append('#define s11  x27\n')
+res.append('#define t3   x28\n')
+res.append('#define t4   x29\n')
+res.append('#define t5   x30\n')
+res.append('#define t6   x31\n')
+
 res.append('int main() {\n')
 
 # Global variables 
@@ -62,8 +98,15 @@ res.append('unsigned int memory[4096] = {5};\n')
 res += info * 4
 pc = 0
 for ln in sys.stdin.readlines():
-    inst_name, *ops = ln.strip(')\n').replace(',', ' ').replace('(', ' ').split()
-    inst = instructions[inst_name]
+    inst_name, *ops = (ln.strip(')\n ')
+                         .replace(',', ' ')
+                         .replace('(', ' ') 
+                         .replace('#', ' ') 
+                       + ' $').split()
+    inst = instructions.get(inst_name)
+    if not inst:
+        sys.stderr.write('Unknown instruction: ' + inst_name + '\n')
+        continue
 
     if inst['type'] == 'r':
         rd = ops[0]
@@ -140,9 +183,12 @@ for ln in sys.stdin.readlines():
 
     elif inst['type'] == 'b':
         res += info
+        res.append('if ({}=={}) pc+={};\n'.format(rs1, rs2, int(branch_target)))
         res.append('asm volatile(\n')
         res.append('"L{}:\\n\\t"\n'.format(pc))
-        res.append('"{} %[_rs1], %[_rs2], L{}\\n\\t"\n'.format(inst_name, branch_target))
+        res.append('"{} %[_rs1], %[_rs2], L{}\\n\\t"\n'.format(
+                inst_name, 
+                pc + int(branch_target)))
         res.append(':\n')
         res.append(': [_rs1] "r" ({}), [_rs2] "r" ({})\n'.format(rs1, rs2))
         res.append(');\n')

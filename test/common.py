@@ -9,6 +9,6 @@ instructions = {
     'srai': {'type': 'i'},
     'lw': {'type': 'i'},
     'sw': {'type': 's'},
-    #  'beq': {'type': 'b'},
+    'beq': {'type': 'b'},
     #  'lui': {'type': 'u'} ,
 }
