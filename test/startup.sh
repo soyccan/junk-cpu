@@ -5,6 +5,7 @@ set -ex
 # openocd -f spike.cfg &
 
 cd tmp
+python3 ../asm.py <a.s >instruction.txt
 riscv32-unknown-elf-gcc -g -Og -c a.c
 riscv32-unknown-elf-gcc -g -Og -T ../spike.lds -nostartfiles a.o
 # riscv32-unknown-elf-g++ generate.cpp generate.s

@@ -17,10 +17,9 @@ while true; do
 
     # Run by RISC-V simulator
     python ../test/embed.py <a.s >a.c
-    docker-compose up
+    docker-compose up  # assembles a.s into instructions.txt also
 
     # Run by JunkCPU
-    python ../test/asm.py <a.s >instruction.txt
     ./cpu.out >/dev/null
 
     if ! python ../test/diff.py output.txt a.log >/dev/null; then

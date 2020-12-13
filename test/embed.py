@@ -77,8 +77,6 @@ res.append('#define t4   x29\n')
 res.append('#define t5   x30\n')
 res.append('#define t6   x31\n')
 
-res.append('int main() {\n')
-
 # Global variables 
 res.append('int pc = -4;\n')
 res.append('int counter = -1;\n')
@@ -93,6 +91,8 @@ res.append(';\n')
 
 # Memory
 res.append('unsigned int memory[4096] = {5};\n')
+
+res.append('int main() {\n')
 
 # First few cycles in pipelined CPU don't show changes
 res += info * 4
@@ -135,7 +135,7 @@ for ln in sys.stdin.readlines():
     elif inst['type'] == 'b':
         rs1 = ops[0]
         rs2 = ops[1]
-        branch_target = ops[2]
+        branch_target = ops[2].replace('.text', '') # relative to .text
 
     # Evaluate instructions
     if inst['type'] == 'r':
@@ -188,7 +188,7 @@ for ln in sys.stdin.readlines():
         res.append('"L{}:\\n\\t"\n'.format(pc))
         res.append('"{} %[_rs1], %[_rs2], L{}\\n\\t"\n'.format(
                 inst_name, 
-                pc + int(branch_target)))
+                branch_target))
         res.append(':\n')
         res.append(': [_rs1] "r" ({}), [_rs2] "r" ({})\n'.format(rs1, rs2))
         res.append(');\n')

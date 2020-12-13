@@ -72,9 +72,11 @@ def main():
     asm_code = sys.stdin.readlines()
 
     assembler = search_in_path(
-        ['riscv64-linux-gnu-as', 'riscv64-unknown-elf-as'])
+        ['riscv32-linux-gnu-as', 'riscv32-unknown-elf-as',
+         'riscv64-linux-gnu-as', 'riscv64-unknown-elf-as'])
     objcopy = search_in_path(
-        ['riscv64-linux-gnu-objcopy', 'riscv64-unknown-elf-objcopy'])
+        ['riscv32-linux-gnu-objcopy', 'riscv32-unknown-elf-objcopy',
+         'riscv64-linux-gnu-objcopy', 'riscv64-unknown-elf-objcopy'])
 
     _run([assembler, '-o', '/tmp/a.out'], ''.join(asm_code).encode())
 
