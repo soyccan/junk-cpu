@@ -1,14 +1,11 @@
 #!/bin/sh
-set -x
+set -ex
+prefix="teamImPastaBlackTea_project1"
 
-sdir="src"
-ddir="b07902143_hw4"
+mkdir -p "${prefix}/codes"
+cp report.pdf "${prefix}/${prefix}_report.pdf"
+cp src/*.v "${prefix}/codes"
 
-mkdir -p "$ddir/codes"
-
-cp report.pdf "$ddir/b07902143_hw4_report.pdf"
-cp "$sdir"/* "$ddir/codes"
-
-rm -f b07902143_hw4.zip
-zip -r b07902143_hw4.zip b07902143_hw4
-rm -rf "$ddir"
+rm -f "${prefix}.zip"
+zip -r "${prefix}.zip" "${prefix}"
+rm -rf "${prefix}"
