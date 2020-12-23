@@ -13,6 +13,8 @@ import os
 import os.path
 import glob
 
+from common import instructions
+
 
 # Reference: https://github.com/Gallopsled/pwntools/blob/dev/pwnlib/asm.py
 def _run(cmd, stdin=None):
@@ -85,6 +87,12 @@ def main():
     m_code = open('/tmp/a.out', 'br').read()
     m_code = [format_machine_code(m_code[i:i+4])
               for i in range(0, len(m_code), 4)]
+
+    for i in range(len(asm_code)):
+        t = asm_code[i].split()
+        if not t[0:] or t[0] not in instructions.keys():
+            asm_code[i] = None
+    asm_code = [x for x in asm_code if x]
 
     for i in range(len(asm_code)):
         sys.stdout.write(m_code[i] + ' //' + asm_code[i])
