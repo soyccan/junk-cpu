@@ -133,7 +133,7 @@ always@(cpu_offset or r_hit_data or cpu_data_i) begin
                         {mem_data_i[255:cpu_offset * 8 + 32], cpu_data_i} : 
                  (cpu_offset == 5'd28) ? 
                         {cpu_data_i, mem_data_i[223:0]} : 
-                 {mem_data_i[255 : cpu_offset * 8 + 32], cpu_data_i, mem_data_i[cpu_offset * 8 - 1 : 0]}
+                 {mem_data_i[255 : cpu_offset * 8 + 32], cpu_data_i, mem_data_i[cpu_offset * 8 - 1 : 0]};
 end
 
 
@@ -239,7 +239,7 @@ Data_Memory Data_Memory
     .addr_i     (mem_addr_o),
     .data_i     (mem_data_o),
     .enable_i   (mem_enable_o),
-    .write_i,   (mem_write_o),
+    .write_i    (mem_write_o),
     .ack_o      (mem_ack_i),
     .data_o     (mem_data_i)
 );
