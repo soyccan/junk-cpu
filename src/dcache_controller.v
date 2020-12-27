@@ -122,18 +122,32 @@ assign    r_hit_data   = sram_cache_data;
 // read data :  256-bit to 32-bit
 always@(cpu_offset or r_hit_data) begin
     // TODO: add your code here! (cpu_data=...?)
-    cpu_data = r_hit_data[cpu_offset * 8 + 31 : cpu_offset * 8];
+    case (cpu_offset)
+        5'd0:  cpu_data = r_hit_data[31:0];
+        5'd4:  cpu_data = r_hit_data[63:32];
+        5'd8:  cpu_data = r_hit_data[95:64];
+        5'd12: cpu_data = r_hit_data[127:96];
+        5'd16: cpu_data = r_hit_data[159:128];
+        5'd20: cpu_data = r_hit_data[191:160];
+        5'd24: cpu_data = r_hit_data[223:192];
+        5'd28: cpu_data = r_hit_data[255:224];
+    endcase
 end
 
 
 // write data :  32-bit to 256-bit
 always@(cpu_offset or r_hit_data or cpu_data_i) begin
     // TODO: add your code here! (w_hit_data=...?)
-    w_hit_data = (cpu_offset == 5'd0) ? 
-                        {mem_data_i[255:cpu_offset * 8 + 32], cpu_data_i} : 
-                 (cpu_offset == 5'd28) ? 
-                        {cpu_data_i, mem_data_i[223:0]} : 
-                 {mem_data_i[255 : cpu_offset * 8 + 32], cpu_data_i, mem_data_i[cpu_offset * 8 - 1 : 0]};
+    case (cpu_offset)
+        5'd0:  w_hit_data = {mem_data_i[255: 32], cpu_data_i                   };
+        5'd4:  w_hit_data = {mem_data_i[255: 64], cpu_data_i, mem_data_i[ 31:0]};
+        5'd8:  w_hit_data = {mem_data_i[255: 96], cpu_data_i, mem_data_i[ 63:0]};
+        5'd12: w_hit_data = {mem_data_i[255:128], cpu_data_i, mem_data_i[ 65:0]};
+        5'd16: w_hit_data = {mem_data_i[255:160], cpu_data_i, mem_data_i[127:0]};
+        5'd20: w_hit_data = {mem_data_i[255:192], cpu_data_i, mem_data_i[159:0]};
+        5'd24: w_hit_data = {mem_data_i[255:224], cpu_data_i, mem_data_i[191:0]};
+        5'd28: w_hit_data = {                     cpu_data_i, mem_data_i[223:0]};
+    endcase
 end
 
 
@@ -163,7 +177,7 @@ always@(posedge clk_i or posedge rst_i) begin
                     mem_enable  <= 1'b1;
                     mem_write   <= 1'b1;
                     cache_write <= 1'b0;
-                    write_back  <= 1'b0;
+                    write_back  <= 1'b1;
                 end
                 else begin                    // write allocate: write miss = read miss + write hit; read miss = read miss + read hit
                     // TODO: add your code here! 
@@ -227,21 +241,6 @@ dcache_sram dcache_sram
     .tag_o      (sram_cache_tag),
     .data_o     (sram_cache_data),
     .hit_o      (hit)
-);
-
-//
-// DRAM (data memory part)
-//
-Data_Memory Data_Memory
-(
-    .clk_i      (clk_i),
-    .rst_i      (rst_i),
-    .addr_i     (mem_addr_o),
-    .data_i     (mem_data_o),
-    .enable_i   (mem_enable_o),
-    .write_i    (mem_write_o),
-    .ack_o      (mem_ack_i),
-    .data_o     (mem_data_i)
 );
 
 endmodule
