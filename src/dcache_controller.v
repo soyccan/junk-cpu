@@ -1,52 +1,52 @@
 module dcache_controller
 (
     // System clock, reset and stall
-    clk_i, 
+    clk_i,
     rst_i,
-    
-    // to Data Memory interface        
-    mem_data_i, 
-    mem_ack_i,     
-    mem_data_o, 
-    mem_addr_o,     
-    mem_enable_o, 
-    mem_write_o, 
-    
-    // to CPU interface    
-    cpu_data_i, 
-    cpu_addr_i,     
-    cpu_MemRead_i, 
-    cpu_MemWrite_i, 
-    cpu_data_o, 
+
+    // to Data Memory interface
+    mem_data_i,
+    mem_ack_i,
+    mem_data_o,
+    mem_addr_o,
+    mem_enable_o,
+    mem_write_o,
+
+    // to CPU interface
+    cpu_data_i,
+    cpu_addr_i,
+    cpu_MemRead_i,
+    cpu_MemWrite_i,
+    cpu_data_o,
     cpu_stall_o
 );
 //
 // System clock, start
 //
-input                 clk_i; 
+input                 clk_i;
 input                 rst_i;
 
 //
-// to Data_Memory interface        
+// to Data_Memory interface
 //
-input    [255:0]      mem_data_i; 
-input                 mem_ack_i; 
-    
-output   [255:0]      mem_data_o; 
-output   [31:0]       mem_addr_o;     
-output                mem_enable_o; 
-output                mem_write_o; 
-    
-//    
-// to CPU interface            
-//    
-input    [31:0]       cpu_data_i; 
-input    [31:0]       cpu_addr_i;     
-input                 cpu_MemRead_i; 
-input                 cpu_MemWrite_i; 
+input    [255:0]      mem_data_i;
+input                 mem_ack_i;
 
-output   [31:0]       cpu_data_o; 
-output                cpu_stall_o; 
+output   [255:0]      mem_data_o;
+output   [31:0]       mem_addr_o;
+output                mem_enable_o;
+output                mem_write_o;
+
+//
+// to CPU interface
+//
+input    [31:0]       cpu_data_i;
+input    [31:0]       cpu_addr_i;
+input                 cpu_MemRead_i;
+input                 cpu_MemWrite_i;
+
+output   [31:0]       cpu_data_o;
+output                cpu_stall_o;
 
 //
 // to SRAM interface
@@ -96,7 +96,7 @@ assign    cpu_tag     = cpu_addr_i[31:9];
 assign    cpu_index   = cpu_addr_i[8:5];
 assign    cpu_offset  = cpu_addr_i[4:0];
 assign    cpu_stall_o = ~hit & cpu_req;
-assign    cpu_data_o  = cpu_data; 
+assign    cpu_data_o  = cpu_data;
 
 // to SRAM interface
 assign    sram_valid = sram_cache_tag[24];
@@ -105,7 +105,7 @@ assign    sram_tag   = sram_cache_tag[22:0];
 assign    cache_sram_index  = cpu_index;
 assign    cache_sram_enable = cpu_req;
 assign    cache_sram_write  = cache_write | write_hit;
-assign    cache_sram_tag    = {1'b1, cache_dirty, cpu_tag};    
+assign    cache_sram_tag    = {1'b1, cache_dirty, cpu_tag};
 assign    cache_sram_data   = (hit) ? w_hit_data : mem_data_i;
 
 // to Data_Memory interface
@@ -115,7 +115,7 @@ assign    mem_data_o   = sram_cache_data;
 assign    mem_write_o  = mem_write;
 
 assign    write_hit    = hit & cpu_MemWrite_i;
-assign    cache_dirty  = write_hit;
+assign    cache_dirty  = 1;  // TODO: is this true?
 
 // TODO: add your code here!  (r_hit_data=...?)
 assign    r_hit_data   = sram_cache_data;
@@ -123,14 +123,14 @@ assign    r_hit_data   = sram_cache_data;
 always@(cpu_offset or r_hit_data) begin
     // TODO: add your code here! (cpu_data=...?)
     case (cpu_offset)
-        5'd0:  cpu_data = r_hit_data[31:0];
-        5'd4:  cpu_data = r_hit_data[63:32];
-        5'd8:  cpu_data = r_hit_data[95:64];
-        5'd12: cpu_data = r_hit_data[127:96];
-        5'd16: cpu_data = r_hit_data[159:128];
-        5'd20: cpu_data = r_hit_data[191:160];
-        5'd24: cpu_data = r_hit_data[223:192];
-        5'd28: cpu_data = r_hit_data[255:224];
+        5'h0:  cpu_data = r_hit_data[ 31:  0];
+        5'h4:  cpu_data = r_hit_data[ 63: 32];
+        5'h8:  cpu_data = r_hit_data[ 95: 64];
+        5'hc:  cpu_data = r_hit_data[127: 96];
+        5'h10: cpu_data = r_hit_data[159:128];
+        5'h14: cpu_data = r_hit_data[191:160];
+        5'h18: cpu_data = r_hit_data[223:192];
+        5'h1c: cpu_data = r_hit_data[255:224];
     endcase
 end
 
@@ -138,20 +138,21 @@ end
 // write data :  32-bit to 256-bit
 always@(cpu_offset or r_hit_data or cpu_data_i) begin
     // TODO: add your code here! (w_hit_data=...?)
+    // Assume address is aligned (cpu_offset is multiple of 4)
     case (cpu_offset)
-        5'd0:  w_hit_data = {mem_data_i[255: 32], cpu_data_i                   };
-        5'd4:  w_hit_data = {mem_data_i[255: 64], cpu_data_i, mem_data_i[ 31:0]};
-        5'd8:  w_hit_data = {mem_data_i[255: 96], cpu_data_i, mem_data_i[ 63:0]};
-        5'd12: w_hit_data = {mem_data_i[255:128], cpu_data_i, mem_data_i[ 65:0]};
-        5'd16: w_hit_data = {mem_data_i[255:160], cpu_data_i, mem_data_i[127:0]};
-        5'd20: w_hit_data = {mem_data_i[255:192], cpu_data_i, mem_data_i[159:0]};
-        5'd24: w_hit_data = {mem_data_i[255:224], cpu_data_i, mem_data_i[191:0]};
-        5'd28: w_hit_data = {                     cpu_data_i, mem_data_i[223:0]};
+        5'h0:  w_hit_data = {r_hit_data[255: 32], cpu_data_i                   };
+        5'h4:  w_hit_data = {r_hit_data[255: 64], cpu_data_i, r_hit_data[ 31:0]};
+        5'h8:  w_hit_data = {r_hit_data[255: 96], cpu_data_i, r_hit_data[ 63:0]};
+        5'hc:  w_hit_data = {r_hit_data[255:128], cpu_data_i, r_hit_data[ 95:0]};
+        5'h10: w_hit_data = {r_hit_data[255:160], cpu_data_i, r_hit_data[127:0]};
+        5'h14: w_hit_data = {r_hit_data[255:192], cpu_data_i, r_hit_data[159:0]};
+        5'h18: w_hit_data = {r_hit_data[255:224], cpu_data_i, r_hit_data[191:0]};
+        5'h1c: w_hit_data = {                     cpu_data_i, r_hit_data[223:0]};
     endcase
 end
 
 
-// controller 
+// controller
 always@(posedge clk_i or posedge rst_i) begin
     if(rst_i) begin
         state       <= STATE_IDLE;
@@ -161,10 +162,14 @@ always@(posedge clk_i or posedge rst_i) begin
         write_back  <= 1'b0;
     end
     else begin
-        case(state)        
+        case(state)
             STATE_IDLE: begin
                 if(cpu_req && !hit) begin      // wait for request
                     state <= STATE_MISS;
+                    mem_enable  <= 1'b1;
+                    mem_write   <= 1'b0;
+                    cache_write <= 1'b0;
+                    write_back  <= 1'b0;
                 end
                 else begin
                     state <= STATE_IDLE;
@@ -172,7 +177,7 @@ always@(posedge clk_i or posedge rst_i) begin
             end
             STATE_MISS: begin
                 if(sram_dirty) begin          // write back if dirty
-                    // TODO: add your code here! 
+                    // TODO: add your code here!
                     state <= STATE_WRITEBACK;
                     mem_enable  <= 1'b1;
                     mem_write   <= 1'b1;
@@ -180,7 +185,7 @@ always@(posedge clk_i or posedge rst_i) begin
                     write_back  <= 1'b1;
                 end
                 else begin                    // write allocate: write miss = read miss + write hit; read miss = read miss + read hit
-                    // TODO: add your code here! 
+                    // TODO: add your code here!
                     state <= STATE_READMISS;
                     mem_enable  <= 1'b1;
                     mem_write   <= 1'b0;
@@ -190,7 +195,7 @@ always@(posedge clk_i or posedge rst_i) begin
             end
             STATE_READMISS: begin
                 if(mem_ack_i) begin            // wait for data memory acknowledge
-                    // TODO: add your code here! 
+                    // TODO: add your code here!
                     state <= STATE_READMISSOK;
                     mem_enable  <= 1'b0;
                     mem_write   <= 1'b0;
@@ -202,7 +207,7 @@ always@(posedge clk_i or posedge rst_i) begin
                 end
             end
             STATE_READMISSOK: begin            // wait for data memory acknowledge
-                // TODO: add your code here! 
+                // TODO: add your code here!
                 state <= STATE_IDLE;
                 mem_enable  <= 1'b0;
                 mem_write   <= 1'b0;
@@ -211,7 +216,7 @@ always@(posedge clk_i or posedge rst_i) begin
             end
             STATE_WRITEBACK: begin
                 if(mem_ack_i) begin            // wait for data memory acknowledge
-                    // TODO: add your code here! 
+                    // TODO: add your code here!
                     state <= STATE_READMISS;
                     mem_enable  <= 1'b1;
                     mem_write   <= 1'b0;
