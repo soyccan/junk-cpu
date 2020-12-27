@@ -1,11 +1,17 @@
 `include "Const.v"
-module CPU(input clk_i,
-           input rst_i,
-           input start_i);
+module CPU(input  clk_i,
+           input  rst_i,
+           input  start_i,
+           input  [255:0] mem_data_i,
+           input  mem_ack_i,
+           output [255:0] mem_data_o,
+           output [31:0]  mem_addr_o,
+           output mem_enable_o,
+           output mem_write_o);
 
-wire clk = clk_i;
-wire rst = rst_i;
-wire start = start_i;
+wire Stall_hazard;
+wire Stall_dcache;
+wire Stall = Stall_hazard || Stall_dcache;
 
 
 wire [31:0] pc_IF;
@@ -15,7 +21,6 @@ wire [31:0] inst_IF;
 
 wire NoOp_ID;
 wire PCWrite_ID;
-wire Stall_ID;
 wire Flush_ID;
 wire Branch_ID;
 wire RegWrite_ID;
@@ -93,10 +98,11 @@ reg [31:0] alu_res_WB;
 assign pc_next_IF = Flush_ID ? branch_target_ID : (pc_IF + 4);
 
 PC PC(
-    .clk_i(clk),
-    .rst_i(rst),
-    .start_i(start),
+    .clk_i(clk_i),
+    .rst_i(rst_i),
+    .start_i(start_i),
     .PCWrite_i(PCWrite_ID),
+    .stall_i(Stall),
     .pc_i(pc_next_IF),
     .pc_o(pc_IF)
 );
@@ -124,12 +130,12 @@ assign rs1_ID = inst_ID[19:15];
 assign rs2_ID = inst_ID[24:20];
 
 // IF/ID Register
-always @(posedge clk) begin
-    if (rst) begin
+always @(posedge clk_i or posedge rst_i) begin
+    if (rst_i) begin
         pc_ID   <= 32'h0;
         inst_ID <= 32'h13; // nop
     end
-    else if (Stall_ID) begin
+    else if (Stall) begin
         pc_ID   <= pc_ID;
         inst_ID <= inst_ID;
     end
@@ -162,7 +168,7 @@ Hazard_Detection_Unit Hazard_Detection_Unit(
     .Rs1_i(rs1_ID),
     .Rs2_i(rs2_ID),
     .NoOp_o(NoOp_ID),
-    .Stall_o(Stall_ID),
+    .Stall_o(Stall_hazard),
     .PCWrite_o(PCWrite_ID)
 );
 
@@ -184,7 +190,7 @@ Imm_Gen Imm_Gen(
 );
 
 Registers Registers(
-    .clk_i(clk),
+    .clk_i(clk_i),
     .RegWrite_i(RegWrite_WB),
     .RDaddr_i(rd_WB),
     .RS1addr_i(rs1_ID),
@@ -201,8 +207,8 @@ Registers Registers(
 ////////////////
 
 // ID/EX Register
-always @(posedge clk) begin
-    if (rst) begin
+always @(posedge clk_i or posedge rst_i) begin
+    if (rst_i) begin
         RegWrite_EX <= 0;
         MemToReg_EX <= 0;
         MemRead_EX  <= 0;
@@ -217,7 +223,7 @@ always @(posedge clk) begin
         rs2_EX      <= 0;
         rd_EX       <= 0;
     end
-    else begin
+    else if (!Stall) begin
         RegWrite_EX <= RegWrite_ID;
         MemToReg_EX <= MemToReg_ID;
         MemRead_EX  <= MemRead_ID;
@@ -264,8 +270,8 @@ ALU ALU(
 /////////////////
 
 // EX/MEM Register
-always @(posedge clk) begin
-    if (rst) begin
+always @(posedge clk_i or posedge rst_i) begin
+    if (rst_i) begin
         RegWrite_MEM    <= 0;
         MemToReg_MEM    <= 0;
         MemRead_MEM     <= 0;
@@ -274,7 +280,7 @@ always @(posedge clk) begin
         data_stored_MEM <= 0;
         rd_MEM          <= 0;
     end
-    else begin
+    else if (!Stall) begin
         RegWrite_MEM    <= RegWrite_EX;
         MemToReg_MEM    <= MemToReg_EX;
         MemRead_MEM     <= MemRead_EX;
@@ -285,13 +291,23 @@ always @(posedge clk) begin
     end
 end
 
-Data_Memory Data_Memory(
-    .clk_i(clk),
-    .MemRead_i(MemRead_MEM),
-    .MemWrite_i(MemWrite_MEM),
-    .addr_i(alu_res_MEM),
-    .data_i(data_stored_MEM),
-    .data_o(data_loaded_MEM)
+dcache_controller dcache(
+    .clk_i(clk_i),
+    .rst_i(rst_i),
+
+    .mem_data_i(mem_data_i),
+    .mem_ack_i(mem_ack_i),
+    .mem_data_o(mem_data_o),
+    .mem_addr_o(mem_addr_o),
+    .mem_enable_o(mem_enable_o),
+    .mem_write_o(mem_write_o),
+
+    .cpu_MemRead_i(MemRead_MEM),
+    .cpu_MemWrite_i(MemWrite_MEM),
+    .cpu_addr_i(alu_res_MEM),
+    .cpu_data_i(data_stored_MEM),
+    .cpu_data_o(data_loaded_MEM),
+    .cpu_stall_o(Stall_dcache)
 );
 
 
@@ -301,15 +317,15 @@ Data_Memory Data_Memory(
 ///////////////
 
 // MEM/WB Register
-always @(posedge clk) begin
-    if (rst) begin
+always @(posedge clk_i or posedge rst_i) begin
+    if (rst_i) begin
         RegWrite_WB    <= 0;
         MemToReg_WB    <= 0;
         alu_res_WB     <= 0;
         data_loaded_WB <= 0;
         rd_WB          <= 0;
     end
-    else begin
+    else if (!Stall) begin
         RegWrite_WB    <= RegWrite_MEM;
         MemToReg_WB    <= MemToReg_MEM;
         alu_res_WB     <= alu_res_MEM;

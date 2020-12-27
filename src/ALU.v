@@ -2,8 +2,7 @@
 module ALU(input [3:0] ALUCtl_i,
            input signed [31:0] Op1_i,
            input signed [31:0] Op2_i,
-           output reg signed [31:0] Res_o,
-           output Zero_o);
+           output reg signed [31:0] Res_o);
 // TODO Output should be wire or reg?
 
 wire signed [4:0] shft_amt = Op2_i[4:0];  // shift amount is only 5 bits
@@ -25,7 +24,5 @@ always @* begin
         `ALU_CTL_SRA:  Res_o = Op1_i >>> shft_amt;
     endcase
 end
-
-assign Zero_o = Res_o == 0;
 
 endmodule
