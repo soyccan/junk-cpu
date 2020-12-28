@@ -176,7 +176,7 @@ always@(posedge clk_i or posedge rst_i) begin
                 end
             end
             STATE_MISS: begin
-                if(sram_dirty) begin          // write back if dirty
+                if(sram_dirty) begin  // write back if dirty
                     // TODO: add your code here!
                     state <= STATE_WRITEBACK;
                     mem_enable  <= 1'b1;
@@ -184,7 +184,7 @@ always@(posedge clk_i or posedge rst_i) begin
                     cache_write <= 1'b0;
                     write_back  <= 1'b1;
                 end
-                else begin                    // write allocate: write miss = read miss + write hit; read miss = read miss + read hit
+                else begin  // write allocate: write miss = read miss + write hit; read miss = read miss + read hit
                     // TODO: add your code here!
                     state <= STATE_READMISS;
                     mem_enable  <= 1'b1;
@@ -194,7 +194,7 @@ always@(posedge clk_i or posedge rst_i) begin
                 end
             end
             STATE_READMISS: begin
-                if(mem_ack_i) begin            // wait for data memory acknowledge
+                if(mem_ack_i) begin  // wait for data memory acknowledge
                     // TODO: add your code here!
                     state <= STATE_READMISSOK;
                     mem_enable  <= 1'b0;
@@ -206,7 +206,7 @@ always@(posedge clk_i or posedge rst_i) begin
                     state <= STATE_READMISS;
                 end
             end
-            STATE_READMISSOK: begin            // wait for data memory acknowledge
+            STATE_READMISSOK: begin  // wait for data memory acknowledge
                 // TODO: add your code here!
                 state <= STATE_IDLE;
                 mem_enable  <= 1'b0;
@@ -215,7 +215,7 @@ always@(posedge clk_i or posedge rst_i) begin
                 write_back  <= 1'b0;
             end
             STATE_WRITEBACK: begin
-                if(mem_ack_i) begin            // wait for data memory acknowledge
+                if(mem_ack_i) begin  // wait for data memory acknowledge
                     // TODO: add your code here!
                     state <= STATE_READMISS;
                     mem_enable  <= 1'b1;

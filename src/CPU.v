@@ -223,7 +223,7 @@ always @(posedge clk_i or posedge rst_i) begin
         rs2_EX      <= 0;
         rd_EX       <= 0;
     end
-    else if (!Stall) begin
+    else if (!Stall_dcache) begin
         RegWrite_EX <= RegWrite_ID;
         MemToReg_EX <= MemToReg_ID;
         MemRead_EX  <= MemRead_ID;
@@ -280,7 +280,7 @@ always @(posedge clk_i or posedge rst_i) begin
         data_stored_MEM <= 0;
         rd_MEM          <= 0;
     end
-    else if (!Stall) begin
+    else if (!Stall_dcache) begin
         RegWrite_MEM    <= RegWrite_EX;
         MemToReg_MEM    <= MemToReg_EX;
         MemRead_MEM     <= MemRead_EX;
@@ -325,7 +325,7 @@ always @(posedge clk_i or posedge rst_i) begin
         data_loaded_WB <= 0;
         rd_WB          <= 0;
     end
-    else if (!Stall) begin
+    else if (!Stall_dcache) begin
         RegWrite_WB    <= RegWrite_MEM;
         MemToReg_WB    <= MemToReg_MEM;
         alu_res_WB     <= alu_res_MEM;
