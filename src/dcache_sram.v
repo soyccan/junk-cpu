@@ -32,7 +32,7 @@ reg      [255:0]   data[0:15][0:1];
 
 integer            i, j;
 
-reg [0:15] LRU;  // the index (0 or 1) to be be replaced
+reg LRU[0:15];  // the index (0 or 1) to be be replaced
 wire eq1;
 wire eq2;
 wire valid1;
