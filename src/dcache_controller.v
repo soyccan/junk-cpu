@@ -115,7 +115,7 @@ assign    mem_data_o   = sram_cache_data;
 assign    mem_write_o  = mem_write;
 
 assign    write_hit    = hit & cpu_MemWrite_i;
-assign    cache_dirty  = 1;  // TODO: is this true?
+assign    cache_dirty  = write_hit;
 
 // TODO: add your code here!  (r_hit_data=...?)
 assign    r_hit_data   = sram_cache_data;
