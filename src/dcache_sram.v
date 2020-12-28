@@ -32,11 +32,11 @@ reg      [255:0]   data[0:15][0:1];
 
 integer            i, j;
 
-reg     LRU;
-wire    eq1;
-wire    eq2;
-wire    valid1;
-wire    valid2;
+reg [0:15] LRU;  // the index (0 or 1) to be be replaced
+wire eq1;
+wire eq2;
+wire valid1;
+wire valid2;
 // Write Data
 // 1. Write hit
 // 2. Read miss: Read from memory
@@ -46,19 +46,23 @@ always@(posedge clk_i or posedge rst_i) begin
             for (j=0;j<2;j=j+1) begin
                 tag[i][j] <= 25'b0;
                 data[i][j] <= 256'b0;
-                LRU <= 1'b0;
+                LRU[i] <= 1'b0;
             end
         end
     end
     if (enable_i && write_i) begin
         // TODO: Handle your write of 2-way associative cache + LRU here
-        if (valid2 || (!hit_o && LRU == 1'b1)) begin
+        if (valid1) begin
+            data[addr_i][0] <= data_i;
+            tag[addr_i][0] <= tag_i;
+        end
+        else if (valid2) begin
             data[addr_i][1] <= data_i;
             tag[addr_i][1] <= tag_i;
         end
-        else if (valid1 || (!hit_o && LRU == 1'b0)) begin
-            data[addr_i][0] <= data_i;
-            tag[addr_i][0] <= tag_i;
+        else begin
+            data[addr_i][LRU[addr_i]] <= data_i;
+            tag[addr_i][LRU[addr_i]] <= tag_i;
         end
     end
 end
@@ -73,17 +77,19 @@ assign hit_o  = (valid1 || valid2) && enable_i;
 
 assign data_o = valid1 ? data[addr_i][0] :
                 valid2 ? data[addr_i][1] :
-                ~LRU   ? data[addr_i][0] :
-                LRU    ? data[addr_i][1] : 256'bx;
+                data[addr_i][LRU[addr_i]];
 
 assign tag_o = valid1 ? tag[addr_i][0] :
                valid2 ? tag[addr_i][1] :
-               ~LRU   ? tag[addr_i][0] :
-               LRU    ? tag[addr_i][1] : 25'bx;
+               tag[addr_i][LRU[addr_i]];
 
 always @(posedge clk_i) begin
-    LRU = valid1 ? 1'b1 :
-          valid2 ? 1'b0 : 1'b0;
+    if (valid1)
+        LRU[addr_i] <= 1'b1;
+    else if (valid2)
+        LRU[addr_i] <= 1'b0;
+    else
+        LRU[addr_i] <= LRU[addr_i];
 end
 
 endmodule
