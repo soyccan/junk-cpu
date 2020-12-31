@@ -88,6 +88,8 @@ always @(posedge clk_i) begin
         LRU[addr_i] <= 1'b1;
     else if (valid2)
         LRU[addr_i] <= 1'b0;
+    else if (write_i)
+        LRU[addr_i] <= ~LRU[addr_i];
     else
         LRU[addr_i] <= LRU[addr_i];
 end
