@@ -12,6 +12,7 @@ import logging as log
 import os
 import os.path
 import glob
+import re
 
 from common import instructions
 
@@ -59,6 +60,13 @@ def format_machine_code(m_code):
     return ''.join(res)
 
 
+def format_asm_code(code):
+    match = re.match(r'(.*?)([0-9]+)\((.*)\)', code)
+    if match:
+        code = '{}{}({})'.format(match[1], hex(int(match[2])), match[3])
+    return code
+
+
 def search_in_path(names):
     for name in names:
         for dir_ in os.environ['PATH'].split(':'):
@@ -92,10 +100,10 @@ def main():
         t = asm_code[i].split()
         if not t[0:] or t[0] not in instructions.keys():
             asm_code[i] = None
-    asm_code = [x for x in asm_code if x]
+    asm_code = [format_asm_code(x) for x in asm_code if x]
 
     for i in range(len(asm_code)):
-        sys.stdout.write(m_code[i] + ' //' + asm_code[i])
+        sys.stdout.write(m_code[i] + ' // ' + asm_code[i] + '\n')
 
 
 main()

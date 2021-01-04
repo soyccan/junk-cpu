@@ -1,6 +1,6 @@
 #!/bin/sh
 set -ex
-prefix="teamImPastaBlackTea_project1"
+prefix="teamImPastaBlackTea_project2"
 
 mkdir -p "${prefix}/codes"
 cp report.pdf "${prefix}/${prefix}_report.pdf"
