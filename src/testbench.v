@@ -11,26 +11,26 @@ reg        [26:0]  address;
 reg        [24:0]  tag;
 reg        [3:0]   index;
 
-wire    [255:0]    mem_cpu_data; 
-wire               mem_cpu_ack;     
-wire    [255:0]    cpu_mem_data; 
-wire    [31:0]     cpu_mem_addr;     
-wire               cpu_mem_enable; 
-wire               cpu_mem_write; 
+wire    [255:0]    mem_cpu_data;
+wire               mem_cpu_ack;
+wire    [255:0]    cpu_mem_data;
+wire    [31:0]     cpu_mem_addr;
+wire               cpu_mem_enable;
+wire               cpu_mem_write;
 parameter          num_cycles = 200;
 
-always #(`CYCLE_TIME/2) Clk = ~Clk;    
+always #(`CYCLE_TIME/2) Clk = ~Clk;
 
 CPU CPU(
     .clk_i  (Clk),
     .rst_i  (Reset),
     .start_i(Start),
-    
-    .mem_data_i(mem_cpu_data), 
-    .mem_ack_i(mem_cpu_ack),     
-    .mem_data_o(cpu_mem_data), 
-    .mem_addr_o(cpu_mem_addr),     
-    .mem_enable_o(cpu_mem_enable), 
+
+    .mem_data_i(mem_cpu_data),
+    .mem_ack_i(mem_cpu_ack),
+    .mem_data_o(cpu_mem_data),
+    .mem_addr_o(cpu_mem_addr),
+    .mem_enable_o(cpu_mem_enable),
     .mem_write_o(cpu_mem_write)
 );
 
@@ -45,7 +45,7 @@ Data_Memory Data_Memory
     .ack_o    (mem_cpu_ack),
     .data_o   (mem_cpu_data)
 );
-  
+
 initial begin
     $dumpfile("CPU.vcd");
     $dumpvars;
@@ -54,17 +54,17 @@ initial begin
     Clk = 0;
     Reset = 1;
     Start = 0;
-    
-    #(`CYCLE_TIME/4) 
+
+    #(`CYCLE_TIME*0.75)
     Reset = 0;
     Start = 1;
-    
+
     // initialize instruction memory (1KB)
     for (i=0; i<255; i=i+1) begin
         CPU.Instruction_Memory.memory[i] = 32'h13;
     end
-    
-        
+
+
     // initialize cache memory    (1KB)
     for (j=0; j<2; j=j+1) begin
         for(i=0; i<16; i=i+1) begin
@@ -73,24 +73,24 @@ initial begin
         end
     end
     // [D-CacheInitialization] DO NOT REMOVE THIS FLAG !!!
-    
+
     // initialize Register File
     for (i=0; i<32; i=i+1) begin
         CPU.Registers.register[i] = 32'b0;
     end
     // [RegisterInitialization] DO NOT REMOVE THIS FLAG !!!
-    
+
     // Load instructions into instruction memory
     // Make sure you change back to "instruction.txt" before submission
     $readmemb("instruction.txt", CPU.Instruction_Memory.memory);
-    
+
     // Open output file
     // Make sure you change back to "output.txt" before submission
     outfile = $fopen("output.txt") | 1;
     // Make sure you change back to "cache.txt" before submission
     outfile2 = $fopen("cache.txt") | 1;
-    
-    
+
+
     // initialize data memory    (16KB)
     for (i=0; i<512; i=i+1) begin
         Data_Memory.memory[i] = 256'b0;
@@ -104,8 +104,8 @@ initial begin
     // [D-MemoryInitialization] DO NOT REMOVE THIS FLAG !!!
 
 end
-  
-always@(posedge Clk) begin
+
+always @(negedge Clk) begin
     if(counter == num_cycles) begin    // store cache to memory
         $fdisplay(outfile, "Flush Cache! \n");
         for (j=0; j<2; j=j+1) begin
@@ -115,16 +115,16 @@ always@(posedge Clk) begin
                 address = {tag[22:0], index};
                 if (tag[24])
                     Data_Memory.memory[address] = CPU.dcache.dcache_sram.data[i][j];
-            end 
+            end
         end
     end
     if(counter > num_cycles) begin    // stop after num_cycles cycles
         $finish;
     end
-        
-    // print PC 
+
+    // print PC
     $fdisplay(outfile, "cycle = %0d, Start = %b\nPC = %d", counter, Start, CPU.PC.pc_o);
-    
+
     // print Registers
     // DO NOT CHANGE THE OUTPUT FORMAT
     $fdisplay(outfile, "Registers");
@@ -148,39 +148,43 @@ always@(posedge Clk) begin
     $fdisplay(outfile, "Data Memory: 0x0400 = %h", Data_Memory.memory[32]);
     $fdisplay(outfile, "Data Memory: 0x0420 = %h", Data_Memory.memory[33]);
     $fdisplay(outfile, "Data Memory: 0x0440 = %h", Data_Memory.memory[34]);
-    
+
     $fdisplay(outfile, "\n");
-    
+
     // print Data Cache Status
     // DO NOT CHANGE THE OUTPUT FORMAT
     if(CPU.dcache.cpu_stall_o && CPU.dcache.state==0) begin
         if(CPU.dcache.sram_dirty) begin
-            if(CPU.dcache.cpu_MemWrite_i) 
+            if(CPU.dcache.cpu_MemWrite_i)
                 $fdisplay(outfile2, "Cycle: %d, Write Miss, Address: %h, Write Data: %h (Write Back!)", counter, CPU.dcache.cpu_addr_i, CPU.dcache.cpu_data_i);
-            else if(CPU.dcache.cpu_MemRead_i) 
+            else if(CPU.dcache.cpu_MemRead_i)
                 $fdisplay(outfile2, "Cycle: %d, Read Miss , Address: %h, Read Data : %h (Write Back!)", counter, CPU.dcache.cpu_addr_i, CPU.dcache.cpu_data_o);
         end
         else begin
-            if(CPU.dcache.cpu_MemWrite_i) 
+            if(CPU.dcache.cpu_MemWrite_i)
                 $fdisplay(outfile2, "Cycle: %d, Write Miss, Address: %h, Write Data: %h", counter, CPU.dcache.cpu_addr_i, CPU.dcache.cpu_data_i);
-            else if(CPU.dcache.cpu_MemRead_i) 
+            else if(CPU.dcache.cpu_MemRead_i)
                 $fdisplay(outfile2, "Cycle: %d, Read Miss , Address: %h, Read Data : %h", counter, CPU.dcache.cpu_addr_i, CPU.dcache.cpu_data_o);
         end
         flag = 1'b1;
     end
     else if(!CPU.dcache.cpu_stall_o) begin
         if(!flag) begin
-            if(CPU.dcache.cpu_MemWrite_i) 
+            if(CPU.dcache.cpu_MemWrite_i)
                 $fdisplay(outfile2, "Cycle: %d, Write Hit , Address: %h, Write Data: %h", counter, CPU.dcache.cpu_addr_i, CPU.dcache.cpu_data_i);
-            else if(CPU.dcache.cpu_MemRead_i) 
+            else if(CPU.dcache.cpu_MemRead_i)
                 $fdisplay(outfile2, "Cycle: %d, Read Hit  , Address: %h, Read Data : %h", counter, CPU.dcache.cpu_addr_i, CPU.dcache.cpu_data_o);
         end
         flag = 1'b0;
     end
-        
-    
-    counter = counter + 1;
 end
 
-  
+always @(posedge Clk) begin
+    if (Reset)
+        counter = 0;
+    else
+        counter = counter + 1;
+end
+
+
 endmodule
