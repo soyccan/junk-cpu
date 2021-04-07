@@ -66,7 +66,7 @@ wire                  sram_valid;
 wire                  sram_dirty;
 
 // controller
-parameter             STATE_IDLE         = 3'h0,
+localparam            STATE_IDLE         = 3'h0,
                       STATE_READMISS     = 3'h1,
                       STATE_READMISSOK   = 3'h2,
                       STATE_WRITEBACK    = 3'h3,
@@ -89,6 +89,8 @@ reg     [255:0]       w_hit_data;
 wire                  write_hit;
 wire                  cpu_req;
 reg     [31:0]        cpu_data;
+
+integer i;
 
 // to CPU interface
 assign    cpu_req     = cpu_MemRead_i | cpu_MemWrite_i;
@@ -122,16 +124,7 @@ assign    r_hit_data   = sram_cache_data;
 // read data :  256-bit to 32-bit
 always@(cpu_offset or r_hit_data) begin
     // TODO: add your code here! (cpu_data=...?)
-    case (cpu_offset)
-        5'h0:  cpu_data = r_hit_data[ 31:  0];
-        5'h4:  cpu_data = r_hit_data[ 63: 32];
-        5'h8:  cpu_data = r_hit_data[ 95: 64];
-        5'hc:  cpu_data = r_hit_data[127: 96];
-        5'h10: cpu_data = r_hit_data[159:128];
-        5'h14: cpu_data = r_hit_data[191:160];
-        5'h18: cpu_data = r_hit_data[223:192];
-        5'h1c: cpu_data = r_hit_data[255:224];
-    endcase
+    cpu_data = r_hit_data[cpu_offset<<3 +: 32];
 end
 
 
@@ -139,16 +132,11 @@ end
 always@(cpu_offset or r_hit_data or cpu_data_i) begin
     // TODO: add your code here! (w_hit_data=...?)
     // Assume address is aligned (cpu_offset is multiple of 4)
-    case (cpu_offset)
-        5'h0:  w_hit_data = {r_hit_data[255: 32], cpu_data_i                   };
-        5'h4:  w_hit_data = {r_hit_data[255: 64], cpu_data_i, r_hit_data[ 31:0]};
-        5'h8:  w_hit_data = {r_hit_data[255: 96], cpu_data_i, r_hit_data[ 63:0]};
-        5'hc:  w_hit_data = {r_hit_data[255:128], cpu_data_i, r_hit_data[ 95:0]};
-        5'h10: w_hit_data = {r_hit_data[255:160], cpu_data_i, r_hit_data[127:0]};
-        5'h14: w_hit_data = {r_hit_data[255:192], cpu_data_i, r_hit_data[159:0]};
-        5'h18: w_hit_data = {r_hit_data[255:224], cpu_data_i, r_hit_data[191:0]};
-        5'h1c: w_hit_data = {                     cpu_data_i, r_hit_data[223:0]};
-    endcase
+    w_hit_data = r_hit_data;
+
+    for (i = 0; i < 32; i = i + 1) begin
+        w_hit_data[(cpu_offset<<3) + i] = cpu_data_i[i];
+    end
 end
 
 

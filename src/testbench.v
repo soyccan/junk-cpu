@@ -22,16 +22,16 @@ parameter          num_cycles = 200;
 always #(`CYCLE_TIME/2) Clk = ~Clk;
 
 CPU CPU(
-    .clk_i  (Clk),
-    .rst_i  (Reset),
-    .start_i(Start),
+    .Clk_i  (Clk),
+    .Rst_i  (Reset),
+    .Start_i(Start),
 
-    .mem_data_i(mem_cpu_data),
-    .mem_ack_i(mem_cpu_ack),
-    .mem_data_o(cpu_mem_data),
-    .mem_addr_o(cpu_mem_addr),
-    .mem_enable_o(cpu_mem_enable),
-    .mem_write_o(cpu_mem_write)
+    .MemData_i(mem_cpu_data),
+    .MemAck_i(mem_cpu_ack),
+    .MemData_o(cpu_mem_data),
+    .MemAddr_o(cpu_mem_addr),
+    .MemEnable_o(cpu_mem_enable),
+    .MemWrite_o(cpu_mem_write)
 );
 
 Data_Memory Data_Memory
@@ -49,6 +49,8 @@ Data_Memory Data_Memory
 initial begin
     $dumpfile("CPU.vcd");
     $dumpvars;
+    $fsdbDumpfile("CPU.fsdb");
+    $fsdbDumpvars("+mda");
     counter = 0;
 
     Clk = 0;
@@ -95,13 +97,14 @@ initial begin
     for (i=0; i<512; i=i+1) begin
         Data_Memory.memory[i] = 256'b0;
     end
-    Data_Memory.memory[0] = 256'h0000_1111_2222_3333_4444_5555_6666_7777_8888_9999_AAAA_BBBB_CCCC_DDDD_EEEE_FFFF;
-    Data_Memory.memory[1] = 256'h8888_9999_AAAA_BBBB_CCCC_DDDD_EEEE_FFFF_7777_6666_5555_4444_3333_2222_1111_0000;
-    Data_Memory.memory[2] = 256'hECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA;
-    Data_Memory.memory[16] = 256'h0123_4567_89AB_CDEF_FEDC_BA98_7654_3210_0123_4567_89AB_CDEF_FEDC_BA98_7654_3210;
-    Data_Memory.memory[17] = 256'h0000_0110_0220_0330_0440_0550_0660_0770_0880_0990_0AA0_0BB0_0CC0_0DD0_0EE0_0FF0;
-    Data_Memory.memory[32] = 256'h0000_1001_2002_3003_4004_5005_6006_7007_8008_9009_A00A_B00B_C00C_D00D_E00E_F00F;
+    // Data_Memory.memory[0] = 256'h0000_1111_2222_3333_4444_5555_6666_7777_8888_9999_AAAA_BBBB_CCCC_DDDD_EEEE_FFFF;
+    // Data_Memory.memory[1] = 256'h8888_9999_AAAA_BBBB_CCCC_DDDD_EEEE_FFFF_7777_6666_5555_4444_3333_2222_1111_0000;
+    // Data_Memory.memory[2] = 256'hECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA_ECFA;
+    // Data_Memory.memory[16] = 256'h0123_4567_89AB_CDEF_FEDC_BA98_7654_3210_0123_4567_89AB_CDEF_FEDC_BA98_7654_3210;
+    // Data_Memory.memory[17] = 256'h0000_0110_0220_0330_0440_0550_0660_0770_0880_0990_0AA0_0BB0_0CC0_0DD0_0EE0_0FF0;
+    // Data_Memory.memory[32] = 256'h0000_1001_2002_3003_4004_5005_6006_7007_8008_9009_A00A_B00B_C00C_D00D_E00E_F00F;
     // [D-MemoryInitialization] DO NOT REMOVE THIS FLAG !!!
+    Data_Memory.memory[0] = 256'd5;
 
 end
 
@@ -122,32 +125,54 @@ always @(negedge Clk) begin
         $finish;
     end
 
+    // if (CPU.Hazard_Detection_Unit.Stall_o == 1 && CPU.Control.Branch_o == 0)
+    //     stall = stall + 1;
+    //
+    // if (CPU.ID_Flush == 1)
+    //     flush = flush + 1;
+
     // print PC
-    $fdisplay(outfile, "cycle = %0d, Start = %b\nPC = %d", counter, Start, CPU.PC.pc_o);
+    $fdisplay(outfile, "cycle = %d, Start = %0d, Stall = %0d, Flush = %0d\nPC = %d", counter, Start, 0, 0, CPU.PC.PC_o);
 
     // print Registers
     // DO NOT CHANGE THE OUTPUT FORMAT
     $fdisplay(outfile, "Registers");
-    $fdisplay(outfile, "x0 = %h, x8  = %h, x16 = %h, x24 = %h", CPU.Registers.register[0], CPU.Registers.register[8] , CPU.Registers.register[16], CPU.Registers.register[24]);
-    $fdisplay(outfile, "x1 = %h, x9  = %h, x17 = %h, x25 = %h", CPU.Registers.register[1], CPU.Registers.register[9] , CPU.Registers.register[17], CPU.Registers.register[25]);
-    $fdisplay(outfile, "x2 = %h, x10 = %h, x18 = %h, x26 = %h", CPU.Registers.register[2], CPU.Registers.register[10], CPU.Registers.register[18], CPU.Registers.register[26]);
-    $fdisplay(outfile, "x3 = %h, x11 = %h, x19 = %h, x27 = %h", CPU.Registers.register[3], CPU.Registers.register[11], CPU.Registers.register[19], CPU.Registers.register[27]);
-    $fdisplay(outfile, "x4 = %h, x12 = %h, x20 = %h, x28 = %h", CPU.Registers.register[4], CPU.Registers.register[12], CPU.Registers.register[20], CPU.Registers.register[28]);
-    $fdisplay(outfile, "x5 = %h, x13 = %h, x21 = %h, x29 = %h", CPU.Registers.register[5], CPU.Registers.register[13], CPU.Registers.register[21], CPU.Registers.register[29]);
-    $fdisplay(outfile, "x6 = %h, x14 = %h, x22 = %h, x30 = %h", CPU.Registers.register[6], CPU.Registers.register[14], CPU.Registers.register[22], CPU.Registers.register[30]);
-    $fdisplay(outfile, "x7 = %h, x15 = %h, x23 = %h, x31 = %h", CPU.Registers.register[7], CPU.Registers.register[15], CPU.Registers.register[23], CPU.Registers.register[31]);
+    // $fdisplay(outfile, "x0 = %h, x8  = %h, x16 = %h, x24 = %h", CPU.Registers.register[0], CPU.Registers.register[8] , CPU.Registers.register[16], CPU.Registers.register[24]);
+    // $fdisplay(outfile, "x1 = %h, x9  = %h, x17 = %h, x25 = %h", CPU.Registers.register[1], CPU.Registers.register[9] , CPU.Registers.register[17], CPU.Registers.register[25]);
+    // $fdisplay(outfile, "x2 = %h, x10 = %h, x18 = %h, x26 = %h", CPU.Registers.register[2], CPU.Registers.register[10], CPU.Registers.register[18], CPU.Registers.register[26]);
+    // $fdisplay(outfile, "x3 = %h, x11 = %h, x19 = %h, x27 = %h", CPU.Registers.register[3], CPU.Registers.register[11], CPU.Registers.register[19], CPU.Registers.register[27]);
+    // $fdisplay(outfile, "x4 = %h, x12 = %h, x20 = %h, x28 = %h", CPU.Registers.register[4], CPU.Registers.register[12], CPU.Registers.register[20], CPU.Registers.register[28]);
+    // $fdisplay(outfile, "x5 = %h, x13 = %h, x21 = %h, x29 = %h", CPU.Registers.register[5], CPU.Registers.register[13], CPU.Registers.register[21], CPU.Registers.register[29]);
+    // $fdisplay(outfile, "x6 = %h, x14 = %h, x22 = %h, x30 = %h", CPU.Registers.register[6], CPU.Registers.register[14], CPU.Registers.register[22], CPU.Registers.register[30]);
+    // $fdisplay(outfile, "x7 = %h, x15 = %h, x23 = %h, x31 = %h", CPU.Registers.register[7], CPU.Registers.register[15], CPU.Registers.register[23], CPU.Registers.register[31]);
+    $fdisplay(outfile, "x0 = %d, x8  = %d, x16 = %d, x24 = %d", CPU.Registers.register[0], CPU.Registers.register[8] , CPU.Registers.register[16], CPU.Registers.register[24]);
+    $fdisplay(outfile, "x1 = %d, x9  = %d, x17 = %d, x25 = %d", CPU.Registers.register[1], CPU.Registers.register[9] , CPU.Registers.register[17], CPU.Registers.register[25]);
+    $fdisplay(outfile, "x2 = %d, x10 = %d, x18 = %d, x26 = %d", CPU.Registers.register[2], CPU.Registers.register[10], CPU.Registers.register[18], CPU.Registers.register[26]);
+    $fdisplay(outfile, "x3 = %d, x11 = %d, x19 = %d, x27 = %d", CPU.Registers.register[3], CPU.Registers.register[11], CPU.Registers.register[19], CPU.Registers.register[27]);
+    $fdisplay(outfile, "x4 = %d, x12 = %d, x20 = %d, x28 = %d", CPU.Registers.register[4], CPU.Registers.register[12], CPU.Registers.register[20], CPU.Registers.register[28]);
+    $fdisplay(outfile, "x5 = %d, x13 = %d, x21 = %d, x29 = %d", CPU.Registers.register[5], CPU.Registers.register[13], CPU.Registers.register[21], CPU.Registers.register[29]);
+    $fdisplay(outfile, "x6 = %d, x14 = %d, x22 = %d, x30 = %d", CPU.Registers.register[6], CPU.Registers.register[14], CPU.Registers.register[22], CPU.Registers.register[30]);
+    $fdisplay(outfile, "x7 = %d, x15 = %d, x23 = %d, x31 = %d", CPU.Registers.register[7], CPU.Registers.register[15], CPU.Registers.register[23], CPU.Registers.register[31]);
 
     // print Data Memory
     // DO NOT CHANGE THE OUTPUT FORMAT
-    $fdisplay(outfile, "Data Memory: 0x0000 = %h", Data_Memory.memory[0]);
-    $fdisplay(outfile, "Data Memory: 0x0020 = %h", Data_Memory.memory[1]);
-    $fdisplay(outfile, "Data Memory: 0x0040 = %h", Data_Memory.memory[2]);
-    $fdisplay(outfile, "Data Memory: 0x0200 = %h", Data_Memory.memory[16]);
-    $fdisplay(outfile, "Data Memory: 0x0220 = %h", Data_Memory.memory[17]);
-    $fdisplay(outfile, "Data Memory: 0x0240 = %h", Data_Memory.memory[18]);
-    $fdisplay(outfile, "Data Memory: 0x0400 = %h", Data_Memory.memory[32]);
-    $fdisplay(outfile, "Data Memory: 0x0420 = %h", Data_Memory.memory[33]);
-    $fdisplay(outfile, "Data Memory: 0x0440 = %h", Data_Memory.memory[34]);
+    // $fdisplay(outfile, "Data Memory: 0x0000 = %h", Data_Memory.memory[0]);
+    // $fdisplay(outfile, "Data Memory: 0x0020 = %h", Data_Memory.memory[1]);
+    // $fdisplay(outfile, "Data Memory: 0x0040 = %h", Data_Memory.memory[2]);
+    // $fdisplay(outfile, "Data Memory: 0x0200 = %h", Data_Memory.memory[16]);
+    // $fdisplay(outfile, "Data Memory: 0x0220 = %h", Data_Memory.memory[17]);
+    // $fdisplay(outfile, "Data Memory: 0x0240 = %h", Data_Memory.memory[18]);
+    // $fdisplay(outfile, "Data Memory: 0x0400 = %h", Data_Memory.memory[32]);
+    // $fdisplay(outfile, "Data Memory: 0x0420 = %h", Data_Memory.memory[33]);
+    // $fdisplay(outfile, "Data Memory: 0x0440 = %h", Data_Memory.memory[34]);
+    $fdisplay(outfile, "Data Memory: 0x00 = %10d", Data_Memory.memory[0]);
+    $fdisplay(outfile, "Data Memory: 0x04 = %10d", Data_Memory.memory[1]);
+    $fdisplay(outfile, "Data Memory: 0x08 = %10d", Data_Memory.memory[2]);
+    $fdisplay(outfile, "Data Memory: 0x0C = %10d", Data_Memory.memory[3]);
+    $fdisplay(outfile, "Data Memory: 0x10 = %10d", Data_Memory.memory[4]);
+    $fdisplay(outfile, "Data Memory: 0x14 = %10d", Data_Memory.memory[5]);
+    $fdisplay(outfile, "Data Memory: 0x18 = %10d", Data_Memory.memory[6]);
+    $fdisplay(outfile, "Data Memory: 0x1C = %10d", Data_Memory.memory[7]);
 
     $fdisplay(outfile, "\n");
 

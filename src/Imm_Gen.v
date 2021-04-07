@@ -23,6 +23,6 @@ assign Imm_o =
             { {12{Inst_i[31]}}, 
               Inst_i[19:12], Inst_i[20], Inst_i[30:21], 1'b0 } :
 
-    32'hz;
+    32'b0;
 
 endmodule
